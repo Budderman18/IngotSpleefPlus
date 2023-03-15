@@ -1,0 +1,8 @@
+#This file stores all the playerdata
+#don't touch this
+version: "1.0"
+#PlayerName:
+    #UUID: <-- the player's UUID
+    #wins
+    #losses
+    #score
