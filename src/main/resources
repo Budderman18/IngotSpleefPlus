@@ -1,0 +1,184 @@
+#dont touch
+version: "1.0"
+#enable debug messages
+#only needed for fixing issues (unless you're a developer or one tells you to, you do not need this)
+enable-debug-mode: false
+#Use this to enable protection in the lobby
+#Players won't be able to build or break stuff when enabled and in the lobby
+enable-protection: true
+#Use this to manage inventories when leaving and joining
+#If you have plugins that do this (multiverse-inventories), use those instead
+enable-inventories: true
+#Use this to regenerate arenas after they've finished
+#usefull if protection in-game is disabled
+#DO NOT ENABLE THIS IF YOU HAVE VERY LARGE ARENAS!!!!(over 1,000,000 blocks inside)
+#IT WILL CAUSE LOTS OF LAG WITH HUGE ARENAS (for now at least)
+regenerate-arena-after-finishing: true
+#Automatically converts any block-based usage (e.g. teleportation)
+#to the center of the block. It also will change yaw & pitch to the
+#nearest 90 degrees if a rotation value is used.
+centerize-teleport-locations: true
+#configure score stat
+#you can change these as high as 127 and as low as -127
+Score:
+    win: 2
+    loss: -1
+#configure leaderboard output
+#You can set max-size, header, format, and footer
+#use %player% for the playname, %type% for the leaderboard type, and %value% for the value
+Leaderboard:
+    max-size: 10
+    header: "&9======== &6Top %type% &9========"
+    format: "&a %player% &f- &c%value%"
+    footer: "&9===================="
+#Configure items to get during a match
+#just type "slotx (with x being the number it appears in) then follow the format below:"
+#ITEMNAME§AMOUNT§DURABILITTY§ENCHANTMENTNAME^LEVEL* or (EFFECTNAME^LENGTH^AMPLIFIER*) or (TYPE^COLOR^FADE^FLICKER^TRAIL*)§NAME§LORE‰§UNBREAKABLE
+#You can also add effects with the following format:
+#  - EFFECTNAME§LENGTH§POTENCY
+items:
+  spleef:
+    slot0: GOLDEN_SHOVEL§1§0§DIG_SPEED^5§Floor Remover§&6Heck off players!‰§true
+    effects:
+    - HASTE§600§9
+#Enable the custom chat features
+#sendGameMessagesToAll will output game messages to everyone on the server
+#For format, use %player% for the playername and %message% for the sent message  
+Chat:
+  enable: false
+  sendGameMessagesToAll: false
+  format: "&2[&eISPChat&2] &7%player% &f&l--> &r&b%message%"
+#Enable the tablist features
+#Header and footer are what the top and bottom of the list show as
+#hidePlayersNotInGame (when enabled) will only show players in your tablist that are in the same arena as you.
+# both hide options are disabled completly and do nothing as of now
+Tablist:
+    enable: false
+    header: "&3[&fIngotSpleef&3]"
+    hidePlayersNotInGame: true
+    footer: "&bPlaying on &aMy &lAwesome&r&a Server&b!"
+#Enable the scoreboard features
+#importMainScoreboard will copy over any used scoreboard elements on the server
+#  ISP will always override these. Useful if you have server-wide scoreboard objectives (e.g. showing health in tablist)
+#maxLines is the siz elimit for the scoreboard
+#Title is the name of the scoreboard
+#You can create your own lines in here. just type "Line(1-15): (text)"
+# Use %currentplayers% to get the amount of players in game, %aliveplayers% to get the amount of players still alive, %maxplayers% for the max amount of players...
+# %borderSize% for the current border size, %playerRadius% for the distance from the center the player is, %time% for the current time in seconds, %timeinvert% for the time remaining in seconds.
+Scoreboard:
+    enable: false
+    importMainScoreboard: true
+    maxLines: 7
+    title: "&3[&fIngotSpleef&3]"
+    line1: "&bPlayers InGame: &c%currentplayers% &7/ &c%maxplayers%"
+    line3: "&bPlayers Alive: &c%aliveplayers% &7/ &c%maxplayers%"
+    line5: "&bTime remaining: &c%timeinvert%"
+    line7: "&aMy Awesome Server!"
+#Enable the tile features
+#title sets the main title
+#subtitle sets the title
+#actionbar sets the text above the hotbar
+#fadeIn and out set how long the fades should be
+#length sets how long the title and subtitle last (doesnt affect actionbar)
+#all values are in ticks (1/20th sec)
+Title:
+    enable: false
+    Join:
+        title: '&aYou have joined the game'
+        subtitle: '&bHave Fun!'
+        actionbar: 'Plugin by Budderman18'
+        fadein: 10
+        length: 100
+        fadeout: 10
+    Start:
+        title: "&aThe game starts in &e"
+        subtitle: ""
+        actionbar: ""
+        fadein: 10
+        length: 60
+        fadeout: 10
+    Leave:
+        title: '&aYou have left the game'
+        subtitle: '&bDon''t do that!'
+        actionbar: 'Plugin by Budderman18'
+        fadein: 10
+        length: 100
+        fadeout: 10
+    InGameStart:
+        title: "&aThe game starts in &e"
+        subtitle: ""
+        actionbar: ""
+        fadein: 10
+        length: 60
+        fadeout: 10
+    InGameRelease:
+        title: "&aSTART!"
+        subtitle: ""
+        actionbar: ""
+        fadein: 10
+        length: 60
+        fadeout: 10
+    Death:
+        title: "&aYou died and are out of the game!"
+        subtitle: "&bFeel free to spectate!"
+        actionbar: ""
+        fadein: 10
+        length: 60
+        fadeout: 10
+    End:
+        title: "&aThe game is over!"
+        subtitle: "&aGood Game Everyone!"
+        actionbar: "Come back soon!"
+        fadein: 10
+        length: 100
+        fadeout: 10
+#Enable the bossbar features
+#sizeChangesBasedOnTimeLeft will decrease the bossbar as the match goes on.
+#title sets the title
+#color sets the color
+#You can use blue, green, pink, purple, red, yellow and white
+Bossbar:
+    enable: false
+    sizeChangesBasedOnTimeLeft: true
+    title: "&eMy Awesome Server!"
+    color: "GREEN"
+#Create your own tables to randomize arena joining!
+#Usefull for servers with different team sizes
+#Enable chosses weather or not tables will be used
+#If disabled, it'll just randomly join all listed arenas
+#tables: <-- put tables below here
+#  Table1: <--Table followed by next number (MUST BE IN NUMERIC ORDER!!!)
+#    name: JoeMama <--name of your table(used for Tab-completion)
+#    arenas: <-- arenas to randomize
+#    - arena1
+#    - arena2
+RandomJoin:
+  enable: false
+  tables:
+    Table1:
+      name: JoeMama
+      arenas:
+      - arena1
+      - arena2
+#Enable the spectator features
+#changeGamemode sets spectators into spectator mode and resets them back when they leave
+#if disabled, players will still be teleported to the spectator pos, just in the same gamemode
+#useful for shorter games with limited camera angles
+Spectate:
+  enable: true
+  changeGamemode: true
+#Enable command blocking features
+#Useful for preventing unintended actions (like warping in-game)
+#allowed-commands allows these commands to bypass blocking
+Commands:
+  enable: true
+  allowed-commands:
+  - sp
+#Enable the double jump features
+#Velocity is the amount of speed you're given upward
+#Sound is the sound to play
+DoubleJump:
+  enable: true
+  delay: 3
+  velocity: 3
+  sound: ENTITY_BLAZE_SHOOT
