@@ -20,16 +20,13 @@ import com.budderman18.IngotSpleefPlus.Core.SPPlayer;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.ConsoleCommandSender;
-import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
@@ -69,10 +66,10 @@ public class Main extends JavaPlugin implements Listener {
         FileConfiguration playerdata = FileManager.getCustomData(pluginn, "playerdata", "");
         FileConfiguration hologram = FileManager.getCustomData(pluginn, "hologram", "");
         Leaderboard board = null;
-        List<String> boardsToCheck = new ArrayList<>();
-        List<ArmorStand> hologramm = null;
-        List<IngotPlayer> players = new ArrayList<>();
-        List<SPPlayer> spplayers = new ArrayList<>();
+        ArrayList<String> boardsToCheck = new ArrayList<>();
+        ArrayList<ArmorStand> hologramm = null;
+        ArrayList<IngotPlayer> players = new ArrayList<>();
+        ArrayList<SPPlayer> spplayers = new ArrayList<>();
         byte maxSize = (byte) config.getInt("Leaderboard.max-size");
         boolean wins = false;
         boolean losses = false;
@@ -87,7 +84,7 @@ public class Main extends JavaPlugin implements Listener {
             //check if not on version
             if (!(key.equalsIgnoreCase("version"))) {
                 //add player
-                SPPlayer.createPlayer(key, false, false, false, false, false, false, (byte) 0, (short) (playerdata.getInt(key + ".kills")), (short) (playerdata.getInt(key + ".deaths")), (short) (playerdata.getInt(key + ".wins")), (short) (playerdata.getInt(key + ".losses")), (short) (playerdata.getInt(key + ".score")), "", (short) 0, true, plugin);
+                SPPlayer.createPlayer(key, false, false, false, playerdata.getInt(key + ".kills"), (short) (playerdata.getInt(key + ".deaths")), (short) (playerdata.getInt(key + ".wins")), (short) (playerdata.getInt(key + ".losses")), (short) (playerdata.getInt(key + ".score")), "", (short) 0, true, false);
             }
         }
         //store players
@@ -246,7 +243,7 @@ public class Main extends JavaPlugin implements Listener {
         FileConfiguration language = FileManager.getCustomData(plugin, "language", "");
         String prefixMessage = ChatColor.translateAlternateColorCodes('&', language.getString("Prefix-Message") + ""); 
         String arenaLoadedMessage = ChatColor.translateAlternateColorCodes('&', language.getString("Arena-Loaded-Message") + ""); 
-        List<Team> teams = new ArrayList<>();
+        ArrayList<Team> teams = new ArrayList<>();
         //check if arena folder isnt made yet
         if (!loadArenas.exists()) {
             loadArenas.mkdirs();
@@ -316,7 +313,7 @@ public class Main extends JavaPlugin implements Listener {
                     Bukkit.getPluginManager().removePermission("ingotsp.arenas." + name);
                 }
                 //create arena
-                temparena = SPArena.createArena(pos1, pos2, world, name, minPlayers, skipPlayers, maxPlayers, teamSize, lobbyWaitTime, lobbySkipTime, gameWaitTime, gameLengthTime, lobby, lobbyWorld, exit, exitWorld, spec, center, status, type, null, "/Arenas/" + key + '/', true, "ingotsp.arenas." + name, plugin);
+                temparena = SPArena.createArena(pos1, pos2, world, name, minPlayers, skipPlayers, maxPlayers, teamSize, lobbyWaitTime, lobbySkipTime, gameWaitTime, gameLengthTime, lobby, lobbyWorld, exit, exitWorld, spec, center, status, type, null, "/Arenas/" + key + '/', true, "ingotsp.arenas." + name);
                 //set lobby again
                 temparena.setLobby(lobby);
                 temparena.setLobbyWorld(lobbyWorld);//cycle spawns
@@ -374,22 +371,23 @@ public class Main extends JavaPlugin implements Listener {
         //create plugin instance
         plugin = this;
         //files
-        FileManager.getCustomData(plugin, "chest", ROOT);
-        FileManager.getCustomData(plugin, "config", ROOT);
-        FileManager.getCustomData(plugin, "hologram", ROOT);
-        FileManager.getCustomData(plugin, "playerdata", ROOT);
+        FileConfiguration chest = FileManager.getCustomData(plugin, "chest", ROOT);
+        FileConfiguration config = FileManager.getCustomData(plugin, "config", ROOT);
+        FileConfiguration hologram = FileManager.getCustomData(plugin, "hologram", ROOT);
+        FileConfiguration playerdata = FileManager.getCustomData(plugin, "playerdata", ROOT);
+        ArrayList<String> comments = new ArrayList<>();
         //language variables
         FileConfiguration language = FileManager.getCustomData(plugin,"language",ROOT);
-        String prefixMessage = ChatColor.translateAlternateColorCodes('&', language.getString("Prefix-Message")); 
-        String unsupportedVersionAMessage = ChatColor.translateAlternateColorCodes('&', language.getString("Unsupported-VersionA-Message")); 
-        String unsupportedVersionBMessage = ChatColor.translateAlternateColorCodes('&', language.getString("Unsupported-VersionB-Message")); 
-        String unsupportedVersionCMessage = ChatColor.translateAlternateColorCodes('&', language.getString("Unsupported-VersionC-Message")); 
-        String unsecureServerAMessage = ChatColor.translateAlternateColorCodes('&', language.getString("Unsecure-ServerA-Message")); 
-        String unsecureServerBMessage = ChatColor.translateAlternateColorCodes('&', language.getString("Unsecure-ServerB-Message")); 
-        String unsecureServerCMessage = ChatColor.translateAlternateColorCodes('&', language.getString("Unsecure-ServerC-Message")); 
-        String pluginEnabledMessage = ChatColor.translateAlternateColorCodes('&', language.getString("Plugin-Enabled-Message")); 
+        String prefixMessage = ChatColor.translateAlternateColorCodes('&', language.getString("Prefix-Message") + ""); 
+        String unsupportedVersionAMessage = ChatColor.translateAlternateColorCodes('&', language.getString("Unsupported-VersionA-Message") + ""); 
+        String unsupportedVersionBMessage = ChatColor.translateAlternateColorCodes('&', language.getString("Unsupported-VersionB-Message") + ""); 
+        String unsupportedVersionCMessage = ChatColor.translateAlternateColorCodes('&', language.getString("Unsupported-VersionC-Message") + ""); 
+        String unsecureServerAMessage = ChatColor.translateAlternateColorCodes('&', language.getString("Unsecure-ServerA-Message") + ""); 
+        String unsecureServerBMessage = ChatColor.translateAlternateColorCodes('&', language.getString("Unsecure-ServerB-Message") + ""); 
+        String unsecureServerCMessage = ChatColor.translateAlternateColorCodes('&', language.getString("Unsecure-ServerC-Message") + ""); 
+        String pluginEnabledMessage = ChatColor.translateAlternateColorCodes('&', language.getString("Plugin-Enabled-Message") + ""); 
         //check for correct version
-        if (!(Bukkit.getVersion().contains("1.19.4"))) {
+        if (!(Bukkit.getVersion().contains("1.20"))) {
             sender.sendMessage(prefixMessage + unsupportedVersionAMessage);
             sender.sendMessage(prefixMessage + unsupportedVersionBMessage);
             sender.sendMessage(prefixMessage + unsupportedVersionCMessage); 
@@ -401,6 +399,50 @@ public class Main extends JavaPlugin implements Listener {
             sender.sendMessage(prefixMessage + unsecureServerCMessage);
             getServer().getPluginManager().disablePlugin(this);
             return;
+        }
+        //check for 1.0->1.1
+        if (config.getString("version").contains("1.0")) {
+            sender.sendMessage(prefixMessage + "&4YOUR FILES ARE OUTDATED!!! &eUpdating...");
+            //config
+            config.set("version", "1.1");
+            config.set("enable-inventories", true);
+            comments.add("Use this to manage inventories when leaving and joining");
+            comments.add("If you have plugins that do this (multiverse-inventories), use those instead");
+            config.setComments("enable-inventories", comments);
+            comments = new ArrayList<>();
+            config.set("Tablist.hidePlayersNotInGame", null);
+            config.set("Tablist.hidePlayersInGameFromServer", null);
+            config.set("Tablist.hidePlayers", true);
+            config.set("Commands.enable", true);
+            comments.add("sg");
+            config.set("Commands.allowed-commands", comments);
+            comments = new ArrayList<>();
+            comments.add("Enable command blocking features");
+            comments.add("Useful for preventing unintended actions (like warping in-game)");
+            comments.add("allowed-commands allows these commands to bypass blocking)");
+            config.setComments("Commands", comments);
+            try {
+                config.save(new File(plugin.getDataFolder() + "/config.yml"));
+            }
+            catch (IOException ex) {}
+            //language
+            language.set("Outdated-Files-Message", "&4YOUR FILES ARE OUTDATED!!! &eUpdating...");
+            language.set("Unusable-Command-Message", "&bYou can't use that command while playing!");
+            language.set("SPStats-Start-Message-1", "&f=======================&6&l");
+            language.set("SPStats-Start-Message-2", "&3's stats&r&f=======================");
+            language.set("SPStats-Kills-Message", "- &aKills: &c");
+            language.set("SPStats-Deaths-Message", "- &aDeaths: &c");
+            language.set("SPStats-KDRatio-Message", "- &aKDRatio: &c");
+            language.set("SPStats-Wins-Message", "- &aWins: &c");
+            language.set("SPStats-Losses-Message", "- &aLosses: &c");
+            language.set("SPStats-WLRatio-Message", "- &aWLRatio: &c");
+            language.set("SPStats-Score-Message", "- &aScore: &c");
+            language.set("SPStats-End-Message", "&f=============================================================");
+            language.set("SPHelp-Stats-Message", "&9/sp stats (player) &f- &eView your or another player's stats");
+            try {
+                language.save(new File(plugin.getDataFolder() + "/language.yml"));
+            }
+            catch (IOException ex) {}
         }
         //commands
         this.getCommand("sp").setExecutor(new SPCommand());
