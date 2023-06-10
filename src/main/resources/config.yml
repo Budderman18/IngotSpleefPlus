@@ -1,5 +1,5 @@
 #dont touch
-version: "1.0"
+version: "1.1"
 #enable debug messages
 #only needed for fixing issues (unless you're a developer or one tells you to, you do not need this)
 enable-debug-mode: false

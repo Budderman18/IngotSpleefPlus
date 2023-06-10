@@ -3,7 +3,7 @@ authors:
 - Budderman18
 description: "A spleef plugin focused on simplicity and efficency."
 main: com.budderman18.IngotSpleefPlus.Main
-version: 1.0
+version: 1.1
 api-version: 1.13
 depend: [IngotMinigamesAPI]
 softdepend: [Multiverse-Core]
@@ -36,6 +36,12 @@ permissions:
     ingotsp.sp.leave:
         description: Gives access to the /sp leave command
         default: true
+    ingotsp.sp.stats:
+        description: Gives access to the /sp stats command
+        default: true
+    ingotsp.sp.stats.others:
+        description: Gives access to the /sp stats command for other players
+        default: op
     ingotsp.sp.team:
         description: Gives access to the /sp team command
         default: true
