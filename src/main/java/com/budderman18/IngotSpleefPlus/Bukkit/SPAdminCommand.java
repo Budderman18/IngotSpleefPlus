@@ -461,7 +461,7 @@ public class SPAdminCommand implements TabExecutor {
      *
      * This method handles the SPAdmin command. 
      *
-     * @param sender the sender object (console, player, block, plugin)
+     * @param sender the sender object (console, player, block)
      * @param cmd The command object
      * @param label The actual command name
      * @param args the command input
@@ -524,7 +524,7 @@ public class SPAdminCommand implements TabExecutor {
                                     //check if pos1 is not greater than pos2
                                     if (pos1[0] < pos2[0] && pos1[1] < pos2[1] && pos1[2] < pos2[2]) {
                                         //create arena
-                                        currentArena = SPArena.createArena(pos1, pos2, player.getWorld().getName(), args[2], (byte) 0, (byte) (0), (byte) 0, (byte) (0), 0, 0, 0, 0, null, "", null, "", null, null, ArenaStatus.DISABLED, null, null, "/Arenas/" + args[2] + '/', true, "ingotsp.arenas." + args[2], plugin);
+                                        currentArena = SPArena.createArena(pos1, pos2, player.getWorld().getName(), args[2], (byte) 0, (byte) (0), (byte) 0, (byte) (0), 0, 0, 0, 0, null, "", null, "", null, null, ArenaStatus.DISABLED, null, null, "/Arenas/" + args[2] + '/', true, "ingotsp.arenas." + args[2]);
                                         currentArena.saveFiles(false);
                                         currentArena.getArenaEquivelent().createArenaSchematic();
                                         //clear pos arrays
@@ -592,7 +592,7 @@ public class SPAdminCommand implements TabExecutor {
                                     if (args.length > 2) {
                                         try {
                                             //load arena
-                                            tempArena = SPArena.selectArena(args[2], plugin);
+                                            tempArena = SPArena.selectArena(args[2]);
                                             //check if arena is disabled
                                             if (tempArena.getArenaEquivelent().getStatus() == ArenaStatus.DISABLED) {
                                                 //delete arena
@@ -623,7 +623,7 @@ public class SPAdminCommand implements TabExecutor {
                                     //check if there is a specifed arena
                                     if (args.length > 4 || (args.length == 4 && (args[2].equalsIgnoreCase("lobby") || args[2].equalsIgnoreCase("exit") || args[2].equalsIgnoreCase("spec") || args[2].equalsIgnoreCase("center")))) {
                                         //load arena
-                                        tempArena = SPArena.selectArena(args[3], plugin);
+                                        tempArena = SPArena.selectArena(args[3]);
                                         if (tempArena != null) {
                                             //check if arena is disabled
                                             if (tempArena.getArenaEquivelent().getStatus() == ArenaStatus.DISABLED) {
@@ -672,7 +672,7 @@ public class SPAdminCommand implements TabExecutor {
                                     if (args.length > 2) {
                                         try {
                                             //load arena
-                                            currentArena = SPArena.selectArena(args[2], plugin);
+                                            currentArena = SPArena.selectArena(args[2]);
                                             currentArena.getName();
                                             sender.sendMessage(prefixMessage + arenaSelectSelectedMessage);
                                             //end command
@@ -704,7 +704,7 @@ public class SPAdminCommand implements TabExecutor {
                                     if (args[index].equalsIgnoreCase("on")) {
                                         //get arena
                                         if (index == 3) {
-                                            tempArena = SPArena.selectArena(args[index-1], plugin);
+                                            tempArena = SPArena.selectArena(args[index-1]);
                                         }
                                         else {
                                             tempArena = currentArena;
@@ -761,7 +761,7 @@ public class SPAdminCommand implements TabExecutor {
                                     if (args[index].equalsIgnoreCase("off")) {
                                         //get arena
                                         if (index == 3) {
-                                            tempArena = SPArena.selectArena(args[index-1], plugin);
+                                            tempArena = SPArena.selectArena(args[index-1]);
                                         }
                                         else {
                                             tempArena = currentArena;
@@ -796,7 +796,7 @@ public class SPAdminCommand implements TabExecutor {
                                                 }
                                                 //check if in game
                                                 if (key.getInGame() == true && key.getIsPlaying() == false && key.getGame().equalsIgnoreCase(tempArena.getName())) {
-                                                    Game.selectGame(tempArena).leaveGame(SPPlayer.selectPlayer(key.getUsername(), plugin), true, false, config.getBoolean("enable-inventories"));
+                                                    Game.selectGame(tempArena).leaveGame(SPPlayer.selectPlayer(key.getUsername()), true, false, config.getBoolean("enable-inventories"));
                                                 }
                                                 //check if arena is empty
                                                 if (tempArena.getCurrentPlayers() == 0) {
@@ -824,7 +824,7 @@ public class SPAdminCommand implements TabExecutor {
                                     //select arena
                                     try {
                                         if (args.length > 2) {
-                                            tempArena = SPArena.selectArena(args[2], plugin);
+                                            tempArena = SPArena.selectArena(args[2]);
                                         } 
                                         else {
                                             tempArena = currentArena;
@@ -855,7 +855,7 @@ public class SPAdminCommand implements TabExecutor {
                                     //select arena
                                     try {
                                         if (args.length > 2) {
-                                            tempArena = SPArena.selectArena(args[2], plugin);
+                                            tempArena = SPArena.selectArena(args[2]);
                                         } 
                                         else {
                                             tempArena = currentArena;
@@ -896,7 +896,7 @@ public class SPAdminCommand implements TabExecutor {
                                             }
                                             else {
                                                 //get arenas
-                                                tempArena = SPArena.selectArena(args[3], plugin);
+                                                tempArena = SPArena.selectArena(args[3]);
                                             }
                                             //check if arena is still null
                                             if (tempArena == null) {
@@ -953,7 +953,7 @@ public class SPAdminCommand implements TabExecutor {
                                             }
                                             else {
                                                 //get files
-                                                tempArena = SPArena.selectArena(args[3], plugin);
+                                                tempArena = SPArena.selectArena(args[3]);
                                             }
                                             if (tempArena.getArenaEquivelent().getSpawns().size()-1 >= 0) {
                                                 //check if arena is disabled
@@ -998,7 +998,7 @@ public class SPAdminCommand implements TabExecutor {
                                             }
                                             else {
                                                 //get files
-                                                tempArena = SPArena.selectArena(args[3], plugin);
+                                                tempArena = SPArena.selectArena(args[3]);
                                             }
                                             sender.sendMessage(arenaSpawnListStart1Message + tempArena.getName() + arenaSpawnListStart2Message);
                                             //cycle through all spawns
@@ -1130,7 +1130,7 @@ public class SPAdminCommand implements TabExecutor {
                                             }
                                         }
                                         //refresh hologram
-                                        tempboard.setPlayers(spplayers);
+                                        tempboard.setPlayers((ArrayList<IngotPlayer>) spplayers);
                                         tempboard.organizeLeaderboard(true);
                                         tempboard.summonHologram(config.getString("Leaderboard.header"), config.getString("Leaderboard.format"), config.getString("Leaderboard.footer"), true);
                                         //tell player and return
@@ -1168,7 +1168,7 @@ public class SPAdminCommand implements TabExecutor {
                                 }
                             }
                             //refresh hologram
-                            tempboard.setPlayers(spplayers);
+                            tempboard.setPlayers((ArrayList<IngotPlayer>) spplayers);
                             //cycle through players
                             for (IngotPlayer key : spplayers) {
                                 //reset score
@@ -1244,14 +1244,14 @@ public class SPAdminCommand implements TabExecutor {
                                     //get player object
                                     player = Bukkit.getPlayer(key.getUsername());
                                     //check if lopbby has bossbar
-                                    if (Lobby.selectLobby(SPArena.selectArena(key.getGame(), plugin)).getBossBar() != null) {
+                                    if (Lobby.selectLobby(SPArena.selectArena(key.getGame())).getBossBar() != null) {
                                         //remove bossbar
-                                        BossbarHandler.clearBar(player, Lobby.selectLobby(SPArena.selectArena(key.getGame(), plugin)).getBossBar());
+                                        BossbarHandler.clearBar(player, Lobby.selectLobby(SPArena.selectArena(key.getGame())).getBossBar());
                                     }
                                     //check if game has bossbar
-                                    if (Game.selectGame(SPArena.selectArena(key.getGame(), plugin)).getBossBar() != null) {
+                                    if (Game.selectGame(SPArena.selectArena(key.getGame())).getBossBar() != null) {
                                         //remove bossbar
-                                        BossbarHandler.clearBar(player, Game.selectGame(SPArena.selectArena(key.getGame(), plugin)).getBossBar());
+                                        BossbarHandler.clearBar(player, Game.selectGame(SPArena.selectArena(key.getGame())).getBossBar());
                                     }
                                     //reset board and list
                                     ScoreboardHandler.clearScoreboard(player);
@@ -1263,14 +1263,14 @@ public class SPAdminCommand implements TabExecutor {
                                         TitleHandler.setActionBar(player, config.getString("Title.Leave.actionbar"));
                                     }
                                     //check if in lobby
-                                    if (Lobby.selectLobby(SPArena.selectArena(key.getGame(), plugin)) != null) {
+                                    if (Lobby.selectLobby(SPArena.selectArena(key.getGame())) != null) {
                                         //teleport to exit
-                                        player.teleport(new Location(Bukkit.getWorld(SPArena.selectArena(key.getGame(), plugin).getArenaEquivelent().getExitWorld()), SPArena.selectArena(key.getGame(), plugin).getArenaEquivelent().getExit()[0], SPArena.selectArena(key.getGame(), plugin).getArenaEquivelent().getExit()[1], SPArena.selectArena(key.getGame(), plugin).getArenaEquivelent().getExit()[2], (float) SPArena.selectArena(key.getGame(), plugin).getArenaEquivelent().getExit()[3], (float) SPArena.selectArena(key.getGame(), plugin).getArenaEquivelent().getExit()[4]));
+                                        player.teleport(new Location(Bukkit.getWorld(SPArena.selectArena(key.getGame()).getArenaEquivelent().getExitWorld()), SPArena.selectArena(key.getGame()).getArenaEquivelent().getExit()[0], SPArena.selectArena(key.getGame()).getArenaEquivelent().getExit()[1], SPArena.selectArena(key.getGame()).getArenaEquivelent().getExit()[2], (float) SPArena.selectArena(key.getGame()).getArenaEquivelent().getExit()[3], (float) SPArena.selectArena(key.getGame()).getArenaEquivelent().getExit()[4]));
                                     }
                                     //check if in game
-                                    if (Game.selectGame(SPArena.selectArena(key.getGame(), plugin)) != null) {
+                                    if (Game.selectGame(SPArena.selectArena(key.getGame())) != null) {
                                         //teleport to exit
-                                        player.teleport(new Location(Bukkit.getWorld(SPArena.selectArena(key.getGame(), plugin).getArenaEquivelent().getExitWorld()), SPArena.selectArena(key.getGame(), plugin).getArenaEquivelent().getExit()[0], SPArena.selectArena(key.getGame(), plugin).getArenaEquivelent().getExit()[1], SPArena.selectArena(key.getGame(), plugin).getArenaEquivelent().getExit()[2], (float) SPArena.selectArena(key.getGame(), plugin).getArenaEquivelent().getExit()[3], (float) SPArena.selectArena(key.getGame(), plugin).getArenaEquivelent().getExit()[4]));
+                                        player.teleport(new Location(Bukkit.getWorld(SPArena.selectArena(key.getGame()).getArenaEquivelent().getExitWorld()), SPArena.selectArena(key.getGame()).getArenaEquivelent().getExit()[0], SPArena.selectArena(key.getGame()).getArenaEquivelent().getExit()[1], SPArena.selectArena(key.getGame()).getArenaEquivelent().getExit()[2], (float) SPArena.selectArena(key.getGame()).getArenaEquivelent().getExit()[3], (float) SPArena.selectArena(key.getGame()).getArenaEquivelent().getExit()[4]));
                                     }
                                 }
                             }
@@ -1287,7 +1287,7 @@ public class SPAdminCommand implements TabExecutor {
                                 if (!Game.selectGame(key).getPlayers().isEmpty()) {
                                     //force players to leave game
                                     for (byte i=(byte) (Game.selectGame(key).getPlayers().size()-1); i >= 0; i--) {
-                                        Game.selectGame(key).leaveGame(SPPlayer.selectPlayer(Game.selectGame(key).getPlayers().get(i).getUsername(), plugin), true, false, config.getBoolean("enable-inventories"));
+                                        Game.selectGame(key).leaveGame(SPPlayer.selectPlayer(Game.selectGame(key).getPlayers().get(i).getUsername()), true, false, config.getBoolean("enable-inventories"));
                                     }
                                 }
                                 //delete arena

@@ -2,7 +2,6 @@ package com.budderman18.IngotSpleefPlus.Bukkit;
 
 import com.budderman18.IngotMinigamesAPI.Core.Data.ArenaStatus;
 import com.budderman18.IngotMinigamesAPI.Core.Data.FileManager;
-import com.budderman18.IngotMinigamesAPI.Core.Data.IngotPlayer;
 import com.budderman18.IngotMinigamesAPI.Core.Data.Team;
 import com.budderman18.IngotSpleefPlus.Core.Game;
 import com.budderman18.IngotSpleefPlus.Core.Lobby;
@@ -10,7 +9,6 @@ import com.budderman18.IngotSpleefPlus.Core.SPArena;
 import com.budderman18.IngotSpleefPlus.Core.SPPlayer;
 import com.budderman18.IngotSpleefPlus.Main;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -20,7 +18,6 @@ import org.bukkit.command.TabExecutor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.potion.PotionEffect;
 
 /**
  * 
@@ -53,6 +50,13 @@ public class SPCommand implements TabExecutor {
     private static String teamFullMessage = ChatColor.translateAlternateColorCodes('&', language.getString("SPTeam-Full-Message") + "");
     private static String leaveLeftGameMessage = ChatColor.translateAlternateColorCodes('&', language.getString("SPLeave-Left-Game-Message") + "");
     private static String leaveNotPlayingMessage = ChatColor.translateAlternateColorCodes('&', language.getString("SPLeave-Not-Playing-Message") + "");
+    private static String statStartMessage1 = ChatColor.translateAlternateColorCodes('&', language.getString("SPStats-Start-Message-1") + "");
+    private static String statStartMessage2 = ChatColor.translateAlternateColorCodes('&', language.getString("SPStats-Start-Message-2") + "");
+    private static String statWinsMessage = ChatColor.translateAlternateColorCodes('&', language.getString("SPStats-Wins-Message") + "");
+    private static String statLossesMessage = ChatColor.translateAlternateColorCodes('&', language.getString("SPStats-Losses-Message") + "");
+    private static String statWLRatioMessage = ChatColor.translateAlternateColorCodes('&', language.getString("SPStats-WLRatio-Message") + "");
+    private static String statScoreMessage = ChatColor.translateAlternateColorCodes('&', language.getString("SPStats-Score-Message") + "");
+    private static String statEndMessage = ChatColor.translateAlternateColorCodes('&', language.getString("SPStats-End-Message") + "");
     private static String listStartMessage = ChatColor.translateAlternateColorCodes('&', language.getString("SPList-Start-Message") + "");
     private static String listStatusMessage = ChatColor.translateAlternateColorCodes('&', language.getString("SPList-Arena-Status-Message") + "");
     private static String listPlayersMessage = ChatColor.translateAlternateColorCodes('&', language.getString("SPList-Arena-Players-Message") + "");
@@ -61,12 +65,12 @@ public class SPCommand implements TabExecutor {
     private static String helpJoinMessage = ChatColor.translateAlternateColorCodes('&', language.getString("SPHelp-Join-Message") + "");
     private static String helpRandomJoinMessage = ChatColor.translateAlternateColorCodes('&', language.getString("SPHelp-RandomJoin-Message") + "");
     private static String helpLeaveMessage = ChatColor.translateAlternateColorCodes('&', language.getString("SPHelp-Leave-Message") + "");
+    private static String helpStatsMessage = ChatColor.translateAlternateColorCodes('&', language.getString("SWHelp-Stats-Message") + "");
     private static String helpTeamMessage = ChatColor.translateAlternateColorCodes('&', language.getString("SPHelp-Team-Message") + "");
     private static String helpListMessage = ChatColor.translateAlternateColorCodes('&', language.getString("SPHelp-List-Message") + "");
     private static String helpHelpMessage = ChatColor.translateAlternateColorCodes('&', language.getString("SPHelp-Help-Message") + "");
     private static String helpEndMessage = ChatColor.translateAlternateColorCodes('&', language.getString("SPHelp-End-Message") + "");
     private static String playerOnlyMessage = ChatColor.translateAlternateColorCodes('&', language.getString("Player-Only-Message") + "");
-    
     /**
      * 
      * This method reloads all files and language strings
@@ -90,6 +94,13 @@ public class SPCommand implements TabExecutor {
         teamJoinedMessage = ChatColor.translateAlternateColorCodes('&', language.getString("SPTeam-Joined-Message") + "");
         teamFullMessage = ChatColor.translateAlternateColorCodes('&', language.getString("SPTeam-Full-Message") + "");
         leaveNotPlayingMessage = ChatColor.translateAlternateColorCodes('&', language.getString("SPLeave-Not-Playing-Message") + "");
+        statStartMessage1 = ChatColor.translateAlternateColorCodes('&', language.getString("SPStats-Start-Message-1") + "");
+        statStartMessage2 = ChatColor.translateAlternateColorCodes('&', language.getString("SPStats-Start-Message-2") + "");
+        statWinsMessage = ChatColor.translateAlternateColorCodes('&', language.getString("SPStats-Wins-Message") + "");
+        statLossesMessage = ChatColor.translateAlternateColorCodes('&', language.getString("SPStats-Losses-Message") + "");
+        statWLRatioMessage = ChatColor.translateAlternateColorCodes('&', language.getString("SPStats-WLRatio-Message") + "");
+        statScoreMessage = ChatColor.translateAlternateColorCodes('&', language.getString("SPStats-Score-Message") + "");
+        statEndMessage = ChatColor.translateAlternateColorCodes('&', language.getString("SPStats-End-Message") + "");
         listStartMessage = ChatColor.translateAlternateColorCodes('&', language.getString("SPList-Start-Message") + "");
         listStatusMessage = ChatColor.translateAlternateColorCodes('&', language.getString("SPList-Arena-Status-Message") + "");
         listPlayersMessage = ChatColor.translateAlternateColorCodes('&', language.getString("SPList-Arena-Players-Message") + "");
@@ -98,6 +109,7 @@ public class SPCommand implements TabExecutor {
         helpJoinMessage = ChatColor.translateAlternateColorCodes('&', language.getString("SPHelp-Join-Message") + "");
         helpRandomJoinMessage = ChatColor.translateAlternateColorCodes('&', language.getString("SPHelp-RandomJoin-Message") + "");
         helpLeaveMessage = ChatColor.translateAlternateColorCodes('&', language.getString("SPHelp-Leave-Message") + "");
+        helpStatsMessage = ChatColor.translateAlternateColorCodes('&', language.getString("SWHelp-Stats-Message") + "");
         helpTeamMessage = ChatColor.translateAlternateColorCodes('&', language.getString("SPHelp-Team-Message") + "");
         helpListMessage = ChatColor.translateAlternateColorCodes('&', language.getString("SPHelp-List-Message") + "");
         helpHelpMessage = ChatColor.translateAlternateColorCodes('&', language.getString("SPHelp-Help-Message") + "");
@@ -127,7 +139,7 @@ public class SPCommand implements TabExecutor {
                     if (sender.hasPermission(loadedArena.getArenaEquivelent().getPermission()) || sender.hasPermission("ingotsp.arenas.*")) {
                         //join lobby
                         lobby = Lobby.selectLobby(loadedArena);
-                        lobby.joinLobby(SPPlayer.selectPlayer(player.getName(), plugin), config.getBoolean("enable-inventories"));
+                        lobby.joinLobby(SPPlayer.selectPlayer(player.getName()), config.getBoolean("enable-inventories"));
                         sender.sendMessage(prefixMessage + joinJoinedGameMessage + loadedArena.getName());
                         return true;
                     } 
@@ -173,25 +185,23 @@ public class SPCommand implements TabExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         //ingot player
-        IngotPlayer iplayer = null;
+        SPPlayer iplayer = null;
         boolean inGame = false;
         //get player
         Player player = Bukkit.getPlayer(sender.getName());
         //local vars
-        List<SPArena> arenas = null;
+        ArrayList<SPArena> arenas = null;
         byte randEnd = 0;
         byte randNum = 0;
         byte currentPlayers = 0;
         SPArena loadedArena = null;
         Team team = null;
         String arenaName = null;
-        List<String> templist = null;
-        PotionEffect[] effects = null;
-        List<PotionEffect> tempeffects = new ArrayList<>();
+        ArrayList<String> templist = null;
         //check if command is /sp
         if (cmd.getName().equalsIgnoreCase("sp")) {
             //obtain ingotplayer
-            iplayer = IngotPlayer.selectPlayer(sender.getName(), plugin);
+            iplayer = SPPlayer.selectPlayer(sender.getName());
             //check if command is empty to prevent errors
             if (args.length > 0) {
                 //check if player has main permission
@@ -206,7 +216,7 @@ public class SPCommand implements TabExecutor {
                                 //check if player is ingame
                                 if (inGame == false) {
                                     //try to join game
-                                    loadedArena = SPArena.selectArena(args[1], plugin);
+                                    loadedArena = SPArena.selectArena(args[1]);
                                     return verifyJoinable(sender, loadedArena, player);
                                 }
                                 //run if player is in game
@@ -239,17 +249,17 @@ public class SPCommand implements TabExecutor {
                                         for (byte h=1; h < 127; h++) {
                                             //check if table is valid
                                             if (!config.getStringList("RandomJoin.tables.Table" + h + ".arenas").isEmpty()) {
-                                                templist = config.getStringList("RandomJoin.tables.Table" + h + ".arenas");
+                                                templist = (ArrayList<String>) config.getStringList("RandomJoin.tables.Table" + h + ".arenas");
                                                 //cycle through all tables
                                                 for (byte i=0; i < templist.size(); i++) {
                                                     //check if name and table are equal
                                                     if (templist.get(i) != null) {
                                                         //increment end value
                                                         randEnd++;
-                                                        if (SPArena.selectArena(templist.get(i), plugin) != null) {
-                                                            if (SPArena.selectArena(templist.get(i), plugin).getArenaEquivelent().getCurrentPlayers() > currentPlayers) {
-                                                                currentPlayers = SPArena.selectArena(templist.get(i), plugin).getArenaEquivelent().getCurrentPlayers();
-                                                                loadedArena = SPArena.selectArena(templist.get(i), plugin);
+                                                        if (SPArena.selectArena(templist.get(i)) != null) {
+                                                            if (SPArena.selectArena(templist.get(i)).getArenaEquivelent().getCurrentPlayers() > currentPlayers) {
+                                                                currentPlayers = SPArena.selectArena(templist.get(i)).getArenaEquivelent().getCurrentPlayers();
+                                                                loadedArena = SPArena.selectArena(templist.get(i));
                                                             }
                                                         }
                                                     }
@@ -263,7 +273,7 @@ public class SPCommand implements TabExecutor {
                                                     }
                                                 }
                                                 if (loadedArena == null) {
-                                                    loadedArena = SPArena.selectArena(arenaName, plugin);
+                                                    loadedArena = SPArena.selectArena(arenaName);
                                                 }
                                                 //try to join game
                                                 return verifyJoinable(sender, loadedArena, player);
@@ -369,15 +379,15 @@ public class SPCommand implements TabExecutor {
                             //check if player isn't ingame
                             if (inGame == true) {
                                 //load arena
-                                loadedArena = SPArena.selectArena(iplayer.getGame(), plugin);
+                                loadedArena = SPArena.selectArena(iplayer.getGame());
                                 //leave lobby
                                 if (iplayer.getIsPlaying() == false) {
                                     lobby = Lobby.selectLobby(loadedArena);
-                                    lobby.leaveLobby(SPPlayer.selectPlayer(player.getName(), plugin), true, config.getBoolean("enable-inventories"));
+                                    lobby.leaveLobby(SPPlayer.selectPlayer(player.getName()), true, config.getBoolean("enable-inventories"));
                                 } //leave game
                                 else if (iplayer.getIsPlaying() == true) {
                                     game = Game.selectGame(loadedArena);
-                                    game.leaveGame(SPPlayer.selectPlayer(iplayer.getUsername(), plugin), true, true, config.getBoolean("enable-inventories"));
+                                    game.leaveGame(SPPlayer.selectPlayer(iplayer.getUsername()), true, true, config.getBoolean("enable-inventories"));
                                 }
                                 //notify player
                                 sender.sendMessage(prefixMessage + leaveLeftGameMessage);
@@ -388,6 +398,39 @@ public class SPCommand implements TabExecutor {
                                 sender.sendMessage(prefixMessage + leaveNotPlayingMessage);
                             }
                             return true;
+                        }
+                    }
+                    //check if player has permission(s)
+                    if (sender.hasPermission("ingotsp.sp.stats") && (sender instanceof Player)) {
+                        //stats feature
+                        if (args[0].equalsIgnoreCase("stats")) {
+                            //check if yours
+                            if (args.length == 3) {
+                                iplayer = SPPlayer.selectPlayer(sender.getName());
+                            }
+                            //check if other
+                            if (args.length == 4 && sender.hasPermission("ingotsp.sp.stats.others")) {
+                                //validate player
+                                if (Bukkit.getPlayer(args[2]) != null) {
+                                    iplayer = SPPlayer.selectPlayer(Bukkit.getPlayer(args[2]).getName());
+                                }
+                                else {
+                                    sender.sendMessage(prefixMessage + incorrectCommandMessage);
+                                    return true;
+                                }
+                            }
+                            //display stats
+                            sender.sendMessage(statStartMessage1 + iplayer.getUsername() + statStartMessage2);
+                            sender.sendMessage(statWinsMessage + iplayer.getIngotPlayerEquivelent().getWins());
+                            sender.sendMessage(statLossesMessage + iplayer.getIngotPlayerEquivelent().getLosses());
+                            if (iplayer.getIngotPlayerEquivelent().getLosses() != 0) {
+                                sender.sendMessage(statWLRatioMessage + (iplayer.getIngotPlayerEquivelent().getWins() / iplayer.getIngotPlayerEquivelent().getLosses()));
+                            }
+                            else {
+                                sender.sendMessage(statWLRatioMessage + iplayer.getIngotPlayerEquivelent().getWins());
+                            }
+                            sender.sendMessage(statScoreMessage + iplayer.getIngotPlayerEquivelent().getScore());
+                            sender.sendMessage(statEndMessage);
                         }
                     }
                     //check if player has permission(s)
@@ -418,6 +461,7 @@ public class SPCommand implements TabExecutor {
                             sender.sendMessage(helpJoinMessage);
                             sender.sendMessage(helpRandomJoinMessage);
                             sender.sendMessage(helpLeaveMessage);
+                            sender.sendMessage(helpStatsMessage);
                             sender.sendMessage(helpTeamMessage);
                             sender.sendMessage(helpListMessage);
                             sender.sendMessage(helpHelpMessage);
@@ -467,18 +511,19 @@ public class SPCommand implements TabExecutor {
      * @return the tabcompletion list
      */
     @Override
-    public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
+    public ArrayList<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         //local vars
-        List<String> arguments = new ArrayList<>();
-        List<SPArena> arenas = null;
+        ArrayList<String> arguments = new ArrayList<>();
+        ArrayList<SPArena> arenas = null;
         SPArena arena = null;
-        IngotPlayer iplayer = null;
+        SPPlayer iplayer = null;
         //main command args
         if (args.length == 1) {
             arguments.add("join");
             arguments.add("randomJoin");
             arguments.add("team");
             arguments.add("leave");
+            arguments.add("stats");
             arguments.add("list");
             arguments.add("help");
         }
@@ -509,8 +554,8 @@ public class SPCommand implements TabExecutor {
         //team command args
         if (args.length == 2 && args[0].equalsIgnoreCase("team") && sender instanceof Player) {
             //get all arenas
-            iplayer = IngotPlayer.selectPlayer(sender.getName(),plugin);
-            arena = SPArena.selectArena(iplayer.getGame(), plugin);
+            iplayer = SPPlayer.selectPlayer(sender.getName());
+            arena = SPArena.selectArena(iplayer.getGame());
             //cycle through all arenas
             if (arena != null) {
                 //cycle through teams

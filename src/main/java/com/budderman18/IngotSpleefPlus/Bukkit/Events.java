@@ -73,17 +73,11 @@ public class Events implements Listener {
     private static Plugin plugin = Main.getInstance();
     //files
     private static final String ROOT = "";
-    private static FileConfiguration config = FileManager.getCustomData(plugin,"config",ROOT);private static FileConfiguration language = FileManager.getCustomData(plugin,"language",ROOT);
+    private static FileConfiguration config = FileManager.getCustomData(plugin,"config",ROOT);
+    private static FileConfiguration language = FileManager.getCustomData(plugin,"language",ROOT);
     //messages
     private static String prefixMessage = ChatColor.translateAlternateColorCodes('&', language.getString("Prefix-Message") + "");
     private static String unusableCommandMessage = ChatColor.translateAlternateColorCodes('&', language.getString("Unusable-Command-Message") + "");
-    //global vars
-    private static boolean inGame = false;
-    private static boolean isPlaying = false;
-    private static boolean isFrozen = false;
-    private static boolean isAlive = true;
-    private static boolean canJump = false;
-    private static SPPlayer iplayer = null;
     /**
      * 
      * This method reloads the config file
@@ -105,18 +99,16 @@ public class Events implements Listener {
     @EventHandler
     public void onBlockBreak(BlockBreakEvent event) {
         //obtain SPPlayerdata
-        iplayer = SPPlayer.selectPlayer(event.getPlayer().getName(), plugin);
-        inGame = iplayer.getIngotPlayerEquivelent().getInGame();
-        isPlaying = iplayer.getIngotPlayerEquivelent().getIsPlaying();
+        SPPlayer iplayer = SPPlayer.selectPlayer(event.getPlayer().getName());
         //check if protection is enabled and player is ingame
-        if (config.getBoolean("enable-protection") == true && inGame == true && isPlaying == false) {  
+        if (config.getBoolean("enable-protection") == true && iplayer.getIngotPlayerEquivelent().getInGame() == true && iplayer.getIngotPlayerEquivelent().getIsPlaying() == false) {  
             //block event
             event.setCancelled(true);
         }
         //check if playing
-        if (isPlaying == true) {
+        if (iplayer.getIngotPlayerEquivelent().getIsPlaying() == true) {
             //add broken block
-            SPPlayer.selectPlayer(iplayer.getIngotPlayerEquivelent().getUsername(), plugin).setBlocksBroken((short) (SPPlayer.selectPlayer(iplayer.getIngotPlayerEquivelent().getUsername(), plugin).getBlocksBroken()+1));
+            SPPlayer.selectPlayer(iplayer.getIngotPlayerEquivelent().getUsername()).setBlocksBroken((short) (SPPlayer.selectPlayer(iplayer.getIngotPlayerEquivelent().getUsername()).getBlocksBroken()+1));
             event.setDropItems(false);
         }
     }
@@ -129,11 +121,9 @@ public class Events implements Listener {
     @EventHandler
     public void onBlockPlace(BlockPlaceEvent event) {
         //get SPPlayerdata
-        iplayer = SPPlayer.selectPlayer(event.getPlayer().getName(), plugin);
-        inGame = iplayer.getIngotPlayerEquivelent().getInGame();
-        isPlaying = iplayer.getIngotPlayerEquivelent().getIsPlaying();
+        SPPlayer iplayer = SPPlayer.selectPlayer(event.getPlayer().getName());
         //check if protection is enabled and player is ingame
-        if (config.getBoolean("enable-protection") == true && inGame == true && isPlaying == false) {  
+        if (config.getBoolean("enable-protection") == true && iplayer.getIngotPlayerEquivelent().getInGame() == true && iplayer.getIngotPlayerEquivelent().getIsPlaying() == false) {  
             //block event
             event.setCancelled(true);
         }
@@ -147,11 +137,9 @@ public class Events implements Listener {
     @EventHandler
     public void onItemDrop(PlayerDropItemEvent event) {
         //get SPPlayerdata
-        iplayer = SPPlayer.selectPlayer(event.getPlayer().getName(), plugin);
-        inGame = iplayer.getIngotPlayerEquivelent().getInGame();
-        isPlaying = iplayer.getIngotPlayerEquivelent().getIsPlaying();
+        SPPlayer iplayer = SPPlayer.selectPlayer(event.getPlayer().getName());
         //check if protection is enabled and player is inGame
-        if (inGame == true || isPlaying == true) { 
+        if (iplayer.getIngotPlayerEquivelent().getInGame() == true || iplayer.getIngotPlayerEquivelent().getIsPlaying() == true) { 
             //cancel event
             event.setCancelled(true);
         }
@@ -165,11 +153,9 @@ public class Events implements Listener {
     @EventHandler
     public void onBlockInteract(PlayerInteractEvent event) {       
         //get SPPlayerdata
-        iplayer = SPPlayer.selectPlayer(event.getPlayer().getName(), plugin);
-        inGame = iplayer.getIngotPlayerEquivelent().getInGame();
-        isPlaying = iplayer.getIngotPlayerEquivelent().getIsPlaying();
+        SPPlayer iplayer = SPPlayer.selectPlayer(event.getPlayer().getName());
         //check if protection is enabled and player is ingame
-        if (config.getBoolean("enable-protection") == true && inGame == true && isPlaying == false) {  
+        if (config.getBoolean("enable-protection") == true && iplayer.getIngotPlayerEquivelent().getInGame() == true && iplayer.getIngotPlayerEquivelent().getIsPlaying() == false) {  
             //cancel event
             event.setCancelled(true);
         }
@@ -183,11 +169,9 @@ public class Events implements Listener {
     @EventHandler
     public void onEntityInteract(PlayerInteractEntityEvent event) {
         //get SPPlayerdata
-        iplayer = SPPlayer.selectPlayer(event.getPlayer().getName(), plugin);
-        inGame = iplayer.getIngotPlayerEquivelent().getInGame();
-        isPlaying = iplayer.getIngotPlayerEquivelent().getIsPlaying();
+        SPPlayer iplayer = SPPlayer.selectPlayer(event.getPlayer().getName());
         //check if protection is enabled and player is ingame
-        if (config.getBoolean("enable-protection") == true && inGame == true && isPlaying == false) {  
+        if (config.getBoolean("enable-protection") == true && iplayer.getIngotPlayerEquivelent().getInGame() == true && iplayer.getIngotPlayerEquivelent().getIsPlaying() == false) {  
             //cancel event
             event.setCancelled(true);
         }
@@ -201,11 +185,9 @@ public class Events implements Listener {
     @EventHandler
     public void onStandInteract(PlayerArmorStandManipulateEvent event) {
         //get SPPlayerdata
-        iplayer = SPPlayer.selectPlayer(event.getPlayer().getName(), plugin);
-        inGame = iplayer.getIngotPlayerEquivelent().getInGame();
-        isPlaying = iplayer.getIngotPlayerEquivelent().getIsPlaying();
+        SPPlayer iplayer = SPPlayer.selectPlayer(event.getPlayer().getName());
         //check if protection is enabled and player is ingame
-        if (config.getBoolean("enable-protection") == true && inGame == true && isPlaying == false) {  
+        if (config.getBoolean("enable-protection") == true && iplayer.getIngotPlayerEquivelent().getInGame() == true && iplayer.getIngotPlayerEquivelent().getIsPlaying() == false) {  
             //cancel event
             event.setCancelled(true);
         }
@@ -219,11 +201,9 @@ public class Events implements Listener {
     @EventHandler
     public void onFrameInteract(PlayerInteractAtEntityEvent event) {
         //get SPPlayerdata
-        iplayer = SPPlayer.selectPlayer(event.getPlayer().getName(), plugin);
-        inGame = iplayer.getIngotPlayerEquivelent().getInGame();
-        isPlaying = iplayer.getIngotPlayerEquivelent().getIsPlaying();
+        SPPlayer iplayer = SPPlayer.selectPlayer(event.getPlayer().getName());
         //check if protection is enabled and player is ingame
-        if (config.getBoolean("enable-protection") == true && inGame == true && isPlaying == false) {  
+        if (config.getBoolean("enable-protection") == true && iplayer.getIngotPlayerEquivelent().getInGame() == true && iplayer.getIngotPlayerEquivelent().getIsPlaying() == false) {  
             //cancel event
             event.setCancelled(true);
         }
@@ -237,11 +217,9 @@ public class Events implements Listener {
     @EventHandler
     public void onLecturnInteract(PlayerTakeLecternBookEvent event) {
         //get SPPlayerdata
-        iplayer = SPPlayer.selectPlayer(event.getPlayer().getName(), plugin);
-        inGame = iplayer.getIngotPlayerEquivelent().getInGame();
-        isPlaying = iplayer.getIngotPlayerEquivelent().getIsPlaying();
+        SPPlayer iplayer = SPPlayer.selectPlayer(event.getPlayer().getName());
         //check if protection is enabled and player is ingame
-        if (config.getBoolean("enable-protection") == true && inGame == true && isPlaying == false) {  
+        if (config.getBoolean("enable-protection") == true && iplayer.getIngotPlayerEquivelent().getInGame() == true && iplayer.getIngotPlayerEquivelent().getIsPlaying() == false) {  
             //cancel event
             event.setCancelled(true);
         }
@@ -257,16 +235,14 @@ public class Events implements Listener {
         //local vars
         Egg egg = null;
         //get SPPlayerdata
-        iplayer = SPPlayer.selectPlayer(event.getPlayer().getName(), plugin);
-        inGame = iplayer.getIngotPlayerEquivelent().getInGame();
-        isPlaying = iplayer.getIngotPlayerEquivelent().getIsPlaying();
+        SPPlayer iplayer = SPPlayer.selectPlayer(event.getPlayer().getName());
         //check if playing
-        if (inGame == true && isPlaying == true) {
+        if (iplayer.getIngotPlayerEquivelent().getInGame() == true && iplayer.getIngotPlayerEquivelent().getIsPlaying() == true) {
             //check if game is splegg and was a right click
-            if (SPArena.selectArena(iplayer.getIngotPlayerEquivelent().getGame(), plugin).getType() == GameType.SPLEGG && (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK)) {
+            if (SPArena.selectArena(iplayer.getIngotPlayerEquivelent().getGame()).getType() == GameType.SPLEGG && (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK)) {
                 //spawn egg
                 egg = event.getPlayer().launchProjectile(Egg.class);
-                SPArena.selectArena(iplayer.getIngotPlayerEquivelent().getGame(), plugin).addEgg(egg);
+                SPArena.selectArena(iplayer.getIngotPlayerEquivelent().getGame()).addEgg(egg);
             }
         }
     }
@@ -325,10 +301,9 @@ public class Events implements Listener {
     @EventHandler
     public void onCommandUse(PlayerCommandPreprocessEvent event) {
         //get SPPlayerdata
-        iplayer = SPPlayer.selectPlayer(event.getPlayer().getName(), plugin);
-        inGame = iplayer.getIngotPlayerEquivelent().getInGame();
+        SPPlayer iplayer = SPPlayer.selectPlayer(event.getPlayer().getName());
         //check if commands are disable
-        if (inGame == true && config.getBoolean("Commands.enable") == true && !event.getPlayer().hasPermission("ingotsw.bypass")) {
+        if (iplayer.getIngotPlayerEquivelent().getInGame() == true && config.getBoolean("Commands.enable") == true && !event.getPlayer().hasPermission("ingotsw.bypass")) {
             //cancel event
             event.setCancelled(true);
             //cycle through allowed commands
@@ -358,13 +333,10 @@ public class Events implements Listener {
     @EventHandler
     public void onFlightToggle(PlayerToggleFlightEvent event) {
         //get SPPlayerdata
-        SPPlayer iplayer = SPPlayer.selectPlayer(event.getPlayer().getName(), plugin);
+        SPPlayer iplayer = SPPlayer.selectPlayer(event.getPlayer().getName());
         Runnable actionn = null;
-        inGame = iplayer.getIngotPlayerEquivelent().getInGame();
-        isPlaying = iplayer.getIngotPlayerEquivelent().getIsPlaying();
-        canJump = iplayer.getCanJump();
         //check if player is in game and playing
-        if (config.getBoolean("DoubleJump.enable") == true && inGame == true && isPlaying == true && canJump == true) {  
+        if (config.getBoolean("DoubleJump.enable") == true && iplayer.getIngotPlayerEquivelent().getInGame() == true && iplayer.getIngotPlayerEquivelent().getIsPlaying() == true && iplayer.getCanJump() == true) {  
             //launch player
             event.getPlayer().setVelocity(new Vector(event.getPlayer().getVelocity().getX(),config.getInt("DoubleJump.velocity"),event.getPlayer().getVelocity().getZ()));
             event.getPlayer().playSound(event.getPlayer(), Sound.valueOf(config.getString("DoubleJump.sound").toUpperCase()), 10, 1);
@@ -376,7 +348,7 @@ public class Events implements Listener {
             event.setCancelled(true);
             event.getPlayer().setVelocity(new Vector(event.getPlayer().getVelocity().getX(),event.getPlayer().getVelocity().getY()-0.1,event.getPlayer().getVelocity().getZ()));
         }
-        else if (config.getBoolean("DoubleJump.enable") == true && inGame == true && isPlaying == true ) {
+        else if (config.getBoolean("DoubleJump.enable") == true && iplayer.getIngotPlayerEquivelent().getInGame() == true && iplayer.getIngotPlayerEquivelent().getIsPlaying() == true ) {
             event.getPlayer().setVelocity(new Vector(event.getPlayer().getVelocity().getX(),event.getPlayer().getVelocity().getY()-0.1,event.getPlayer().getVelocity().getZ()));
             event.setCancelled(true);
         }
@@ -388,18 +360,16 @@ public class Events implements Listener {
      * @param event the event ran
      */
     @EventHandler
-    public void onEntityDamage(EntityDamageEvent event) {
+    public void onEntityDamage(EntityDamageEvent event) {            
+        //local vars
+        SPPlayer iplayer = SPPlayer.selectPlayer(event.getEntity().getName());
         //check if entity is a player
-        if (event.getEntity().getType() == PLAYER && SPPlayer.selectPlayer(event.getEntity().getName(), plugin) != null) {
-            //get iplayer vars
-            iplayer = SPPlayer.selectPlayer(event.getEntity().getName(), plugin);
-            inGame = iplayer.getIngotPlayerEquivelent().getInGame();
-            isPlaying = iplayer.getIngotPlayerEquivelent().getIsPlaying();
+        if (event.getEntity().getType() == PLAYER && SPPlayer.selectPlayer(event.getEntity().getName()) != null) {
             //check if in lobby with protection or ingame
-            if (config.getBoolean("enable-protection") == true && inGame == true && isPlaying == false) {
+            if (config.getBoolean("enable-protection") == true && iplayer.getIngotPlayerEquivelent().getInGame() == true && iplayer.getIngotPlayerEquivelent().getIsPlaying() == false) {
                 event.setCancelled(true);
             }
-            if (isPlaying == true && (event.getCause() == DamageCause.FALL || event.getCause() == DamageCause.VOID || event.getCause() == DamageCause.LAVA || event.getCause() == DamageCause.FIRE || event.getCause() == DamageCause.BLOCK_EXPLOSION)) {
+            if (iplayer.getIngotPlayerEquivelent().getIsPlaying() == true && (event.getCause() == DamageCause.FALL || event.getCause() == DamageCause.VOID || event.getCause() == DamageCause.LAVA || event.getCause() == DamageCause.FIRE || event.getCause() == DamageCause.BLOCK_EXPLOSION)) {
                 event.setCancelled(false);
             }
         }
@@ -415,6 +385,7 @@ public class Events implements Listener {
     public void onEntityHit(EntityDamageByEntityEvent event) {
         //local vars
         boolean cancel = false;
+        SPPlayer iplayer = null;
         //check if entity is an armor stand
         if (event.getEntity().getType() == EntityType.ARMOR_STAND) {
             //cycle through leaderboards
@@ -430,13 +401,11 @@ public class Events implements Listener {
             event.setCancelled(cancel);
         }
         //check if entity is a player and killer is a player
-        if (event.getEntityType() == PLAYER && event.getDamager().getType() == PLAYER && SPPlayer.selectPlayer(event.getDamager().getName(), plugin) != null) {
+        if (event.getEntityType() == PLAYER && event.getDamager().getType() == PLAYER && SPPlayer.selectPlayer(event.getDamager().getName()) != null) {
             //get SPPlayerdata
-            iplayer = SPPlayer.selectPlayer(event.getDamager().getName(), plugin);
-            inGame = iplayer.getIngotPlayerEquivelent().getInGame();
-            isPlaying = iplayer.getIngotPlayerEquivelent().getIsPlaying();
+            iplayer = SPPlayer.selectPlayer(event.getDamager().getName());
             //check if protection is enabled and player is ingame
-            if ((config.getBoolean("enable-protection") == true && inGame == true) || isPlaying == true) {  
+            if ((config.getBoolean("enable-protection") == true && iplayer.getIngotPlayerEquivelent().getInGame() == true) || iplayer.getIngotPlayerEquivelent().getIsPlaying() == true) {  
                 //cancel event
                 event.setCancelled(true);
             }
@@ -444,21 +413,19 @@ public class Events implements Listener {
         //check if entity is a player
         else if (event.getDamager().getType() == PLAYER) {
             //reset death vars
-            iplayer = SPPlayer.selectPlayer(event.getDamager().getName(), plugin);
-            inGame = iplayer.getIngotPlayerEquivelent().getInGame();
+            iplayer = SPPlayer.selectPlayer(event.getDamager().getName());
             //check if protection is enable
-            if (config.getBoolean("enable-protection") == true && inGame == true) {
+            if (config.getBoolean("enable-protection") == true && iplayer.getIngotPlayerEquivelent().getInGame() == true) {
                 //dont damage
                 event.setCancelled(true);
             }
         }
         //check if damagee is a player
-        else if (event.getEntity().getType() == PLAYER && SPPlayer.selectPlayer(event.getEntity().getName(), plugin) != null) {
+        else if (event.getEntity().getType() == PLAYER && SPPlayer.selectPlayer(event.getEntity().getName()) != null) {
             //reset death vars
-            iplayer = SPPlayer.selectPlayer(event.getEntity().getName(), plugin);
-            inGame = iplayer.getIngotPlayerEquivelent().getInGame();
+            iplayer = SPPlayer.selectPlayer(event.getEntity().getName());
             //check if protection is enable
-            if (config.getBoolean("enable-protection") == true && inGame == true) {
+            if (config.getBoolean("enable-protection") == true && iplayer.getIngotPlayerEquivelent().getInGame() == true) {
                 //dont damage
                 event.setCancelled(true);
             }
@@ -504,18 +471,14 @@ public class Events implements Listener {
     public void onPlayerMove(PlayerMoveEvent event) {
         //local vars
         Location frozenpos = event.getTo();
-        //get SPPlayerdata
-        iplayer = SPPlayer.selectPlayer(event.getPlayer().getName(), plugin);
-        inGame = iplayer.getIngotPlayerEquivelent().getInGame();
-        isFrozen = iplayer.getIngotPlayerEquivelent().getIsFrozen();
-        isAlive = iplayer.getIngotPlayerEquivelent().getIsAlive();
+        SPPlayer iplayer = SPPlayer.selectPlayer(event.getPlayer().getName());
         //get arena
         SPArena selectedArena = null;
         if (iplayer.getIngotPlayerEquivelent().getGame() != null || !"".equals(iplayer.getIngotPlayerEquivelent().getGame())) {
-            selectedArena = SPArena.selectArena(iplayer.getIngotPlayerEquivelent().getGame(), plugin);
+            selectedArena = SPArena.selectArena(iplayer.getIngotPlayerEquivelent().getGame());
         }
         //check if player is froxen
-        if (isFrozen == true) {
+        if (iplayer.getIsFrozen() == true) {
             //reset position to current position
             frozenpos.setX(event.getFrom().getX());
             frozenpos.setY(event.getFrom().getBlockY());
@@ -525,7 +488,7 @@ public class Events implements Listener {
         }
         //check if player is spectating and in arena
         if (iplayer.getIngotPlayerEquivelent().getGame() != null || !"".equals(iplayer.getIngotPlayerEquivelent().getGame())) {
-            if (inGame == true && isAlive == false && event.getPlayer().getGameMode() == SPECTATOR && selectedArena.getArenaEquivelent().isInArena(event.getPlayer().getLocation()) == false) {
+            if (iplayer.getIngotPlayerEquivelent().getInGame() == true && iplayer.getIngotPlayerEquivelent().getIsAlive() == false && event.getPlayer().getGameMode() == SPECTATOR && selectedArena.getArenaEquivelent().isInArena(event.getPlayer().getLocation()) == false) {
                 //move player to center
                 frozenpos = event.getPlayer().getLocation();
                 frozenpos.setX(selectedArena.getArenaEquivelent().getCenter()[0]);
@@ -549,20 +512,17 @@ public class Events implements Listener {
         List<Player> players = new ArrayList<>();
         SPPlayer currentIPlayer = null;
         Player player = null;
-        //SPPlayerdata
-        iplayer = SPPlayer.selectPlayer(event.getPlayer().getName(), plugin);
-        inGame = iplayer.getIngotPlayerEquivelent().getInGame();
+        SPPlayer iplayer = SPPlayer.selectPlayer(event.getPlayer().getName());
         //check if player is inGame and chat is enabled
-        if (inGame == true && config.getBoolean("Chat.enable") == true) {
+        if (iplayer.getIngotPlayerEquivelent().getInGame() == true && config.getBoolean("Chat.enable") == true) {
             //cancel event
             event.setCancelled(true);
             //cycle between all players
             for (Player key : Bukkit.getOnlinePlayers()) {
                 //get SPPlayer
-                currentIPlayer = SPPlayer.selectPlayer(key.getName(), plugin);
-                inGame = currentIPlayer.getInGame();
+                currentIPlayer = SPPlayer.selectPlayer(key.getName());
                 //checfk if player is inGame
-                if (inGame == true && currentIPlayer.getGame().equals(iplayer.getIngotPlayerEquivelent().getGame())) {
+                if (currentIPlayer.getIngotPlayerEquivelent().getInGame() == true && currentIPlayer.getGame().equals(iplayer.getIngotPlayerEquivelent().getGame())) {
                     //add player to list
                     players.add(key);
                 }
@@ -586,11 +546,10 @@ public class Events implements Listener {
     public void onPlayerDeath(PlayerDeathEvent event) {
         //local vars
         String message = "";
+        SPPlayer iplayer = SPPlayer.selectPlayer(event.getEntity().getName());
         try {
-            iplayer = SPPlayer.selectPlayer(event.getEntity().getName(), plugin);
-            inGame = iplayer.getIngotPlayerEquivelent().getInGame();
             //check if player is ingame
-            if (inGame == true) {
+            if (iplayer.getIngotPlayerEquivelent().getInGame() == true) {
                 //check for fall
                 if (event.getDeathMessage().contains("high place") || event.getDeathMessage().contains("fell out")) {
                     //get message
@@ -653,17 +612,19 @@ public class Events implements Listener {
         //local vars
         Location spec = null;
         SPArena currentArena = null;
-        SPPlayer selectedPlayer = SPPlayer.selectPlayer(event.getPlayer().getName(), plugin);
+        SPPlayer iplayer = SPPlayer.selectPlayer(event.getPlayer().getName());
         //check if player is playing ad is alive
-        if (selectedPlayer.getIsPlaying() == true && selectedPlayer.getIsAlive() == true) {
+        if (iplayer.getIngotPlayerEquivelent().getIsPlaying() == true && iplayer.getIngotPlayerEquivelent().getIsAlive() == true) {
             //get arena info
-            currentArena = SPArena.selectArena(iplayer.getIngotPlayerEquivelent().getGame(), plugin);
+            currentArena = SPArena.selectArena(iplayer.getIngotPlayerEquivelent().getGame());
             try {
                 spec = new Location(Bukkit.getWorld(currentArena.getArenaEquivelent().getWorld()), currentArena.getArenaEquivelent().getSpectatorPos()[0],  currentArena.getArenaEquivelent().getSpectatorPos()[1], currentArena.getArenaEquivelent().getSpectatorPos()[2], (float) currentArena.getArenaEquivelent().getSpectatorPos()[3], (float) currentArena.getArenaEquivelent().getSpectatorPos()[4]);
             }
-            catch (NullPointerException ex) {}
+            catch (NullPointerException ex) {
+                spec = event.getRespawnLocation();
+            }
             //set as dead and inst spectator mode, as well as teleport
-            selectedPlayer.setIsAlive(false);
+            iplayer.getIngotPlayerEquivelent().setIsAlive(false);
             event.getPlayer().setGameMode(SPECTATOR);
             event.setRespawnLocation(spec);
         }
@@ -679,11 +640,9 @@ public class Events implements Listener {
         //files
         File playerdataf = new File(plugin.getDataFolder(), "playerdata.yml");
         FileConfiguration playerdata = FileManager.getCustomData(plugin, "playerdata", ROOT);
-        //get player
         Player player = event.getPlayer();
-        //create SPPlayer object
-        SPPlayer newPlayer = SPPlayer.selectPlayer(event.getPlayer().getName(), plugin);
-        //refresh scoreboard 
+        SPPlayer newPlayer = SPPlayer.selectPlayer(event.getPlayer().getName());
+        SPPlayer iplayer = null;
         //check if a new player
         if (playerdata.getString(player.getName() + ".uuid") == null) {
             //set data
@@ -699,7 +658,7 @@ public class Events implements Listener {
                 }
             }
             //create object
-            iplayer = SPPlayer.createPlayer(event.getPlayer().getName(), false, false, false, false, false, false, (byte) 0, (short) (0), (short) (0), (short) (0), (short) (0), (short) (0), "", (short) 0, true, plugin);
+            iplayer = SPPlayer.createPlayer(event.getPlayer().getName(), false, false, false, 0, (short) (0), (short) (0), (short) (0), (short) (0), "", (short) 0, true, false);
             //cycle through leaderboards
             for (Leaderboard key : Leaderboard.getInstances(plugin)) {
                 //add the new player
@@ -722,21 +681,19 @@ public class Events implements Listener {
         //local vars
         Lobby lobby = null;
         Game game = null;
-        //refresh scoreboard 
-        try {
-            //SPPlayerdata
-            iplayer = SPPlayer.selectPlayer(event.getPlayer().getName(), plugin);
+        SPPlayer iplayer = SPPlayer.selectPlayer(event.getPlayer().getName());
+        try {    
             //check if ingame and not playing
             if (iplayer.getIngotPlayerEquivelent().getInGame() == true && iplayer.getIngotPlayerEquivelent().getIsPlaying() == false) {
                 //leave lobby
-                lobby = Lobby.selectLobby(SPArena.selectArena(iplayer.getIngotPlayerEquivelent().getGame(), plugin));
-                lobby.leaveLobby(SPPlayer.selectPlayer(event.getPlayer().getName(), plugin), true, config.getBoolean("enable-inventories"));
+                lobby = Lobby.selectLobby(SPArena.selectArena(iplayer.getIngotPlayerEquivelent().getGame()));
+                lobby.leaveLobby(SPPlayer.selectPlayer(event.getPlayer().getName()), true, config.getBoolean("enable-inventories"));
             }
             //check if playing
             else if (iplayer.getIngotPlayerEquivelent().getIsPlaying() == true) {
                 //leave game
-                game = Game.selectGame(SPArena.selectArena(iplayer.getIngotPlayerEquivelent().getGame(), plugin));
-                game.leaveGame(SPPlayer.selectPlayer(event.getPlayer().getName(), plugin), true, true, config.getBoolean("enable-inventories"));
+                game = Game.selectGame(SPArena.selectArena(iplayer.getIngotPlayerEquivelent().getGame()));
+                game.leaveGame(SPPlayer.selectPlayer(event.getPlayer().getName()), true, true, config.getBoolean("enable-inventories"));
             }
             //check if spectating
             else if (iplayer.getIngotPlayerEquivelent().getIsPlaying() == true && event.getPlayer().getGameMode() == GameMode.SPECTATOR) {
