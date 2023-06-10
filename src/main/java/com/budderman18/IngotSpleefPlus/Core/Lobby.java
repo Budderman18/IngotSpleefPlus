@@ -11,7 +11,6 @@ import com.budderman18.IngotMinigamesAPI.Core.Handlers.TimerHandler;
 import com.budderman18.IngotMinigamesAPI.Core.Handlers.TitleHandler;
 import com.budderman18.IngotSpleefPlus.Main;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.bukkit.Bukkit;
@@ -53,9 +52,9 @@ public class Lobby {
     private SPArena arena = null;
     private BossBar bossbar = null;
     private int index = 0;
-    private List<SPPlayer> players = new ArrayList<>();
+    private ArrayList<SPPlayer> players = new ArrayList<>();
     private static int trueIndex = 0;
-    private static List<Lobby> lobbies = new ArrayList<>();
+    private static ArrayList<Lobby> lobbies = new ArrayList<>();
     /**
      *
      * This constructor sets up a lobby for a given arena
@@ -102,7 +101,7 @@ public class Lobby {
     }
     /**
      * 
-     * This method gets thebossbar for the lobby
+     * This method gets the bossbar for the lobby
      * 
      * @return the bossbar
      */
@@ -120,7 +119,7 @@ public class Lobby {
      * 
      * @return the player list
      */
-    public List<SPPlayer> getPlayers() {
+    public ArrayList<SPPlayer> getPlayers() {
         //return selection
         if (lobbies.contains(this)) {
             return lobbies.get(this.index).players;
@@ -140,7 +139,7 @@ public class Lobby {
         Player player = Bukkit.getPlayer(iplayer.getUsername());
         Location lobbyloc = null;
         ItemStack[] items = new ItemStack[41];
-        List<PotionEffect> effects = new ArrayList<>();
+        ArrayList<PotionEffect> effects = new ArrayList<>();
         PotionEffect[] trueEffects = null;
         float[] xpp = new float[2];
         float[] hpp = new float[2];
@@ -180,7 +179,10 @@ public class Lobby {
             //set header and footer
             TablistHandler.setHeader(player, config.getString("Tablist.header"));
             TablistHandler.setFooter(player, config.getString("Tablist.footer"));
-            //TablistHandler.removePlayers(arena);
+            //check if hiding
+            if (config.getBoolean("Tablist.hidePlayers") == true) {
+                TablistHandler.removePlayers(this.arena, plugin);
+            }
         }
         //check if titles are enabled
         if (config.getBoolean("Title.enable") == true) {
@@ -335,7 +337,7 @@ public class Lobby {
                     //cycle through all spawns
                     Spawn.moveToRandomSpawn(this.arena.getArenaEquivelent().getSpawns(), player, this.arena.getArenaEquivelent().getWorld());
                     //join game and leave lobby
-                    game.joinGame(SPPlayer.selectPlayer(player.getName(), plugin), false);
+                    game.joinGame(SPPlayer.selectPlayer(player.getName()), false);
                     this.players.remove(this.players.get(i));
                 }
                 //set arena as active
@@ -353,7 +355,7 @@ public class Lobby {
             int skip = this.arena.getArenaEquivelent().getLobbySkipTime();
             int end = 0;
             String blankString = " ";
-            String lineString = "";
+            String lineString = null;
             byte usedTeams = 0;
             Player player = null;
             //cycle throguh all players
@@ -393,7 +395,7 @@ public class Lobby {
                                 }
                             }
                             if (config.getBoolean("Scoreboard.importMainScoreboard") == true) {
-                                ScoreboardHandler.updateScoreboard();
+                                ScoreboardHandler.updateScoreboard(player);
                             }
                             lineString = "";
                             blankString = " ";

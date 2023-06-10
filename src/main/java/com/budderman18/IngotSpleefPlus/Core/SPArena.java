@@ -7,7 +7,6 @@ import com.budderman18.IngotSpleefPlus.Main;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -22,15 +21,14 @@ import org.bukkit.plugin.Plugin;
  */
 public class SPArena extends Arena {
     //arena vars
-    private String name = "";
-    private Plugin plugin = null;
+    private String name = null;
     private GameType type = null;
-    List<Egg> launchedEggs = null;
+    ArrayList<Egg> launchedEggs = null;
     private int index = 0;
     //global vars
-    private static Plugin staticPlugin = Main.getInstance();
-    private static FileConfiguration config = FileManager.getCustomData(staticPlugin, "config", "");
-    private static List<SPArena> arenas = new ArrayList<>();
+    private static Plugin plugin = Main.getInstance();
+    private static FileConfiguration config = FileManager.getCustomData(plugin, "config", "");
+    private static ArrayList<SPArena> arenas = new ArrayList<>();
     private static int trueIndex = 0;
     /**
      * 
@@ -67,30 +65,28 @@ public class SPArena extends Arena {
      * @param specPoss the position players are teleported to when spectating
      * @param saveFilee weather or not to save a settings file
      * @param permName name of the permission to add
-     * @param pluginn the plugin to attach this arena to
      * @return The arena object that was generated
      */
-    public static SPArena createArena(int[] pos1, int[] pos2, String worldd, String arenaName, byte minPlayerss, byte skipPlayerss, byte maxPlayerss, byte teamSizee, int lobbyWaitTimee, int lobbySkipTimee, int gameWaitTimee, int gameLengthh, double[] lobbyPoss, String lobbyWorldd, double[] exitPoss, String exitWorldd, double[] specPoss, double[] centerPoss, ArenaStatus statuss, GameType type, List<Egg> eggs, String filePathh, boolean saveFilee, String permName, Plugin pluginn) {
+    public static SPArena createArena(int[] pos1, int[] pos2, String worldd, String arenaName, byte minPlayerss, byte skipPlayerss, byte maxPlayerss, byte teamSizee, int lobbyWaitTimee, int lobbySkipTimee, int gameWaitTimee, int gameLengthh, double[] lobbyPoss, String lobbyWorldd, double[] exitPoss, String exitWorldd, double[] specPoss, double[] centerPoss, ArenaStatus statuss, GameType type, ArrayList<Egg> eggs, String filePathh, boolean saveFilee, String permName) {
         //newArena
         Arena extendedArena = null;
-        SPArena arena = new SPArena();
+        SPArena arena = null;
         //files
-        File arenaDataf = new File(pluginn.getDataFolder() + filePathh, "settings.yml");
-        FileConfiguration arenaData = FileManager.getCustomData(pluginn, "settings", filePathh);
+        File arenaDataf = new File(plugin.getDataFolder() + filePathh, "settings.yml");
+        FileConfiguration arenaData = FileManager.getCustomData(plugin, "settings", filePathh);
         //check if unextended arena needs creation
-        if (Arena.selectArena(arenaName, pluginn) == null) {
+        if (Arena.selectArena(arenaName, plugin) == null) {
             //create arena
-            extendedArena = Arena.createArena(pos1, pos2, worldd, arenaName, minPlayerss, skipPlayerss, maxPlayerss, teamSizee, lobbyWaitTimee, lobbySkipTimee, gameWaitTimee, gameLengthh, lobbyPoss, lobbyWorldd, exitPoss, exitWorldd, specPoss, centerPoss, filePathh, saveFilee, statuss, permName, pluginn);    
+            extendedArena = Arena.createArena(pos1, pos2, worldd, arenaName, minPlayerss, skipPlayerss, maxPlayerss, teamSizee, lobbyWaitTimee, lobbySkipTimee, gameWaitTimee, gameLengthh, lobbyPoss, lobbyWorldd, exitPoss, exitWorldd, specPoss, centerPoss, filePathh, saveFilee, statuss, permName, plugin);    
         }
         else {
             //select arena
-            extendedArena = Arena.selectArena(arenaName, pluginn);
+            extendedArena = Arena.selectArena(arenaName, plugin);
         }
-        //set selection vars
-        arena.name = arenaName;
-        arena.plugin = pluginn;
         //convert loaded Arena into this SPArena
         arena = SPArena.castToSPArena(extendedArena);
+        //set selection vars
+        arena.name = arenaName;
         //set vars
         if (type == null) {
             type = GameType.SPLEEF;
@@ -102,7 +98,7 @@ public class SPArena extends Arena {
         arena.launchedEggs = eggs;
         arena.index = trueIndex;
         //check if saving file
-        if (saveFilee == true && type != null) {
+        if (saveFilee == true) {
             //drop vars
             arenaData.set("game-type", type.name());
             //save file
@@ -151,7 +147,6 @@ public class SPArena extends Arena {
         this.type = null;
         this.launchedEggs = null;
         this.name = null;
-        this.plugin = null;
         this.index = 0;
         trueIndex--;
     }
@@ -164,13 +159,13 @@ public class SPArena extends Arena {
      * @param pluginn the plugin to use when searching
      * @return the sparena that was located
      */
-    public static SPArena selectArena(String namee, Plugin pluginn) {
+    public static SPArena selectArena(String namee) {
         //cycle between all instances of arena
         for (SPArena key : arenas) {
             //check if arena incstanc e name isn't null
             if (key.getName() != null) {
                 //check if arena is what is requested
-                if (key.getName().equals(namee) && key.getPlugin() == pluginn) {
+                if (key.getName().equals(namee)) {
                     //set selection data
                     return key;
                 }
@@ -189,9 +184,9 @@ public class SPArena extends Arena {
      * 
      * @return The list of arenas
      */
-    public static List<SPArena> getSPInstances() {
+    public static ArrayList<SPArena> getSPInstances() {
         //local vars
-        List<SPArena> arenass = new ArrayList<>();
+        ArrayList<SPArena> arenass = new ArrayList<>();
         //cycle through arenas
         for (SPArena key : arenas) {
             //check if name isnt null
@@ -280,7 +275,7 @@ public class SPArena extends Arena {
         newArena.setCurrentPlayers(arena.getCurrentPlayers());
         newArena.setFilePath(arena.getFilePath());
         //cycle through arenas
-        for (Arena key : Arena.getInstances(staticPlugin)) {
+        for (Arena key : Arena.getInstances(plugin)) {
             //check if arena matches this one
             if (key.getName().equalsIgnoreCase(arena.getName())) {
                 //set index
@@ -382,7 +377,6 @@ public class SPArena extends Arena {
         //return selection as a fallback
         return this.type;
     }
-    
     /**
      *
      * This method adds an egg to the selected arena. 
@@ -417,7 +411,7 @@ public class SPArena extends Arena {
      *
      * @param eggs the list to set
      */
-    public void setEggs(List<Egg> eggs) {
+    public void setEggs(ArrayList<Egg> eggs) {
         //set instance list
         if (arenas.contains(this)) {
             arenas.get(this.index).launchedEggs = eggs;
@@ -431,7 +425,7 @@ public class SPArena extends Arena {
      *
      * @return the team list
      */
-    public List<Egg> getEggs() {
+    public ArrayList<Egg> getEggs() {
         //return instance list
         if (arenas.contains(this)) {
             return arenas.get(this.index).launchedEggs;

@@ -14,7 +14,6 @@ import com.budderman18.IngotMinigamesAPI.Core.Handlers.TitleHandler;
 import com.budderman18.IngotMinigamesAPI.Core.MissingBukkitMethods;
 import com.budderman18.IngotSpleefPlus.Main;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.bukkit.Bukkit;
@@ -55,9 +54,9 @@ public class Game {
     private SPArena arena = null;
     private BossBar bossbar = null;
     private int index = 0;
-    private List<SPPlayer> players = new ArrayList<>();
+    private ArrayList<SPPlayer> players = new ArrayList<>();
     private static int trueIndex = 0;
-    private static List<Game> games = new ArrayList<>();
+    private static ArrayList<Game> games = new ArrayList<>();
     //language
     private static String gameWinnerMessage = ChatColor.translateAlternateColorCodes('&', language.getString("Game-Winner-Message")  + "");
     private static String gameDrawMessage = ChatColor.translateAlternateColorCodes('&', language.getString("Game-Draw-Message")  + "");
@@ -125,7 +124,7 @@ public class Game {
      * 
      * @return the player list
      */
-    public List<SPPlayer> getPlayers() {
+    public ArrayList<SPPlayer> getPlayers() {
         //return selection
         if (games.contains(this)) {
             return games.get(this.index).players;
@@ -167,6 +166,10 @@ public class Game {
             //set header and footer
             TablistHandler.setHeader(player, config.getString("Tablist.header"));
             TablistHandler.setFooter(player, config.getString("Tablist.footer"));
+            //check if hiding
+            if (config.getBoolean("Tablist.hidePlayers") == true) {
+                TablistHandler.removePlayers(this.arena, plugin);
+            }
         }
         //check if titles are enabled
         if (config.getBoolean("Title.enable") == true) {
@@ -207,22 +210,22 @@ public class Game {
         //local vars
         Location exitLoc = new Location(Bukkit.getWorld(this.arena.getArenaEquivelent().getExitWorld()), this.arena.getArenaEquivelent().getExit()[0], this.arena.getArenaEquivelent().getExit()[1], this.arena.getArenaEquivelent().getExit()[2], (float) this.arena.getArenaEquivelent().getExit()[3], (float) this.arena.getArenaEquivelent().getExit()[4]); 
         Player player = Bukkit.getPlayer(iplayer.getUsername());
-        short losses = iplayer.getLosses();
-        short score = iplayer.getScore();
+        short losses = iplayer.getIngotPlayerEquivelent().getLosses();
+        short score = iplayer.getIngotPlayerEquivelent().getScore();
         //remove player
         this.players.remove(iplayer);
         this.currentPlayers--;
         this.arena.setCurrentPlayers(this.currentPlayers);
         this.alivePlayers--;
         //check if player isnt alive
-        if (iplayer.getIsAlive() == false) {
+        if (iplayer.getIngotPlayerEquivelent().getIsAlive() == false) {
             //back to adventure
             player.setGameMode(GameMode.SURVIVAL);
         }
         //set iplayer vars
         iplayer.getIngotPlayerEquivelent().setInGame(false);
         iplayer.getIngotPlayerEquivelent().setIsPlaying(false);
-        iplayer.getIngotPlayerEquivelent().setIsFrozen(false);
+        iplayer.setIsFrozen(false);
         iplayer.getIngotPlayerEquivelent().setIsAlive(true);
         iplayer.setBlocksBroken((short) 0);
         //check if adding a loss
@@ -303,7 +306,7 @@ public class Game {
             short broken = 0;
             short wins = 0;
             short score = 0;
-            String message = "";
+            String message = null;
             SPPlayer keyy = null;
             SPPlayer winner = null;
             boolean tieChecked = false;
@@ -316,7 +319,7 @@ public class Game {
                         player.setAllowFlight(false);
                     }
                     //check if player isnt alive
-                    if (key.getIsAlive() == false) {
+                    if (key.getIngotPlayerEquivelent().getIsAlive() == false) {
                         player.setGameMode(GameMode.SURVIVAL);
                     }
                     //check if title is enabled
@@ -411,11 +414,11 @@ public class Game {
                 //check if player is dead
                 if (this.players.get(i).getIngotPlayerEquivelent().getIsAlive() == false) {
                     //force leave
-                    this.leaveGame(SPPlayer.selectPlayer(this.players.get(i).getIngotPlayerEquivelent().getUsername(), plugin), false, true, config.getBoolean("enable-inventories"));
+                    this.leaveGame(SPPlayer.selectPlayer(this.players.get(i).getIngotPlayerEquivelent().getUsername()), false, true, config.getBoolean("enable-inventories"));
                 }
                 //run to force winner to leave
                 else {
-                    this.leaveGame(SPPlayer.selectPlayer(this.players.get(i).getIngotPlayerEquivelent().getUsername(), plugin), true, false, config.getBoolean("enable-inventories"));
+                    this.leaveGame(SPPlayer.selectPlayer(this.players.get(i).getIngotPlayerEquivelent().getUsername()), true, false, config.getBoolean("enable-inventories"));
                 }
             }
             //set arena as inactive
@@ -456,7 +459,7 @@ public class Game {
                         if (config.getBoolean("DoubleJump.enable") == true) {
                             player.setAllowFlight(true);
                         }
-                        keys.getIngotPlayerEquivelent().setIsFrozen(false);
+                        keys.setIsFrozen(false);
                         //check if titles are enabled
                         if (config.getBoolean("Title.enable") == true) {
                             //set title and actionbar
@@ -564,7 +567,7 @@ public class Game {
                                 }
                             }
                             if (config.getBoolean("Scoreboard.importMainScoreboard") == true) {
-                                ScoreboardHandler.updateScoreboard();
+                                ScoreboardHandler.updateScoreboard(player);
                             }
                             lineString = "";
                             blankString = " ";
@@ -577,7 +580,7 @@ public class Game {
                             for (SPPlayer keys : this.players) {
                                 //freeze player
                                 player = Bukkit.getPlayer(keys.getIngotPlayerEquivelent().getUsername());
-                                keys.getIngotPlayerEquivelent().setIsFrozen(true);
+                                keys.setIsFrozen(true);
                                 //check if titles are enabled
                                 if (config.getBoolean("Title.enable")) {
                                     //set title and actionbar
@@ -654,7 +657,7 @@ public class Game {
             this.time = 0;
             this.barSize = 1;
             this.gameStarted = false;
-            this.gameWaiting =  false;
+            this.gameWaiting = false;
             this.players = new ArrayList<>();
             this.bossbar = null;
             //check if arena needs regenerating

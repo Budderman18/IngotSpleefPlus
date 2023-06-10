@@ -6,7 +6,6 @@ import com.budderman18.IngotSpleefPlus.Main;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -20,15 +19,15 @@ import org.bukkit.plugin.Plugin;
  */
 public class SPPlayer extends IngotPlayer {
     //player vars
-    private String name = "";
-    private Plugin plugin = null;
+    private String name = null;
     private short blocksBroken = 0;
     private boolean canJump = true;
+    private boolean isFrozen = false;
     private int index = 0;
     //global vars
-    private static Plugin staticPlugin = Main.getInstance();
-    private static FileConfiguration config = FileManager.getCustomData(staticPlugin, "config", "");
-    private static List<SPPlayer> players = new ArrayList<>();
+    private static Plugin plugin = Main.getInstance();
+    private static FileConfiguration config = FileManager.getCustomData(plugin, "config", "");
+    private static ArrayList<SPPlayer> players = new ArrayList<>();
     private static int trueIndex = 0;
     /**
      * 
@@ -38,34 +37,43 @@ public class SPPlayer extends IngotPlayer {
     private SPPlayer() {}
     /**
      *
-     * This method creates a new spplayer.It will also save the settings file.
-     * Use createPlayerSchematic() for the region file
+     * This method creates a new spplayer.It will also save the settings file.Use createPlayerSchematic() for the region file
      *
      * @param iplayer the player name
-     * @param pluginn the plugin to attach this player to
+     * @param inGamee the ingame
+     * @param isPlayingg the is playing
+     * @param isAlivee the is alive
+     * @param deathss the deaths
+     * @param winss the wins
+     * @param killss the kills
+     * @param scoree the score
+     * @param gamee the game
+     * @param jumpp the isJumping
+     * @param lossess the losses
+     * @param brokenn the isBroken
+     * @param isFrozenn the isFrozen
      * @return The player object that was generated
      */
-    public static SPPlayer createPlayer(String iplayer, boolean inGamee, boolean isPlayingg, boolean isFrozenn, boolean isGracedd, boolean isAlivee, boolean isAttackedd, byte gameKillss, short killss, short deathss, short winss, short lossess, short scoree, String gamee, short brokenn, boolean jumpp, Plugin pluginn) {
+    public static SPPlayer createPlayer(String iplayer, boolean inGamee, boolean isPlayingg, boolean isAlivee, int killss, short deathss, short winss, short lossess, short scoree, String gamee, short brokenn, boolean jumpp, boolean isFrozenn) {
         //newPlayer
         IngotPlayer extendedPlayer = null;
-        SPPlayer player = new SPPlayer();
+        SPPlayer player = null;
         //check if unextended player needs creation
-        if (IngotPlayer.selectPlayer(iplayer, pluginn) == null) {
+        if (IngotPlayer.selectPlayer(iplayer, plugin) == null) {
             //create player
-            extendedPlayer = IngotPlayer.createPlayer(iplayer, inGamee, isPlayingg, isFrozenn, isGracedd, isAlivee, isAttackedd, gameKillss, killss, deathss, winss, lossess, scoree, gamee, pluginn);    
+            extendedPlayer = IngotPlayer.createPlayer(iplayer, inGamee, isPlayingg, isAlivee, killss, deathss, winss, lossess, scoree, gamee, plugin);    
         }
         else {
             //select player
-            extendedPlayer = IngotPlayer.selectPlayer(iplayer, pluginn);
+            extendedPlayer = IngotPlayer.selectPlayer(iplayer, plugin);
         }
-        //set selection vars
-        player.name = iplayer;
-        player.plugin = pluginn;
         //convert loaded Player into this SPPlayer
         player = SPPlayer.castToSPPlayer(extendedPlayer);
         //set vars
+        player.name = iplayer;
         player.blocksBroken = brokenn;
         player.canJump = jumpp;
+        player.isFrozen = isFrozenn;
         player.index = trueIndex;
         //add and return player
         players.add(player);
@@ -93,8 +101,8 @@ public class SPPlayer extends IngotPlayer {
         players.remove(this.index);
         this.blocksBroken = 0;
         this.canJump = false;
+        this.isFrozen = false;
         this.name = null;
-        this.plugin = null;
         this.index = 0;
         trueIndex--;
     }
@@ -107,13 +115,13 @@ public class SPPlayer extends IngotPlayer {
      * @param pluginn the plugin to use when searching
      * @return the spplayer that was located
      */
-    public static SPPlayer selectPlayer(String namee, Plugin pluginn) {
+    public static SPPlayer selectPlayer(String namee) {
         //cycle between all instances of player
         for (SPPlayer key : players) {
             //check if player incstanc e name isn't null
             if (key.getUsername() != null) {
                 //check if player is what is requested
-                if (key.getUsername().equals(namee) && key.getPlugin() == pluginn) {
+                if (key.getUsername().equals(namee)) {
                     //set selection data
                     return key;
                 }
@@ -132,9 +140,9 @@ public class SPPlayer extends IngotPlayer {
      * 
      * @return The list of players
      */
-    public static List<SPPlayer> getSPInstances() {
+    public static ArrayList<SPPlayer> getSPInstances() {
         //local vars
-        List<SPPlayer> playerss = new ArrayList<>();
+        ArrayList<SPPlayer> playerss = new ArrayList<>();
         //cycle through players
         for (SPPlayer key : players) {
             //check if name isnt null
@@ -192,9 +200,6 @@ public class SPPlayer extends IngotPlayer {
         newPlayer.setUsername(player.getUsername());
         newPlayer.setInGame(player.getInGame());
         newPlayer.setIsPlaying(player.getIsPlaying());
-        newPlayer.setIsFrozen(player.getIsFrozen());
-        newPlayer.setIsGraced(player.getIsGraced());
-        newPlayer.setIsAttacked(player.getIsAttacked());
         newPlayer.setIsAlive(player.getIsAlive());
         newPlayer.setInventory(player.getInventory());
         newPlayer.setEffects(player.getEffects());
@@ -202,14 +207,13 @@ public class SPPlayer extends IngotPlayer {
         newPlayer.setTeam(player.getTeam(), false);
         newPlayer.setGame(player.getGame());
         newPlayer.setHealth(player.getHealth());
-        newPlayer.setGameKills(player.getGameKills());
         newPlayer.setKills(player.getKills());
         newPlayer.setDeaths(player.getDeaths());
         newPlayer.setWins(player.getWins());
         newPlayer.setLosses(player.getLosses());
         newPlayer.setScore(player.getScore());
         //cycle through players
-        for (IngotPlayer key : IngotPlayer.getInstances(staticPlugin)) {
+        for (IngotPlayer key : IngotPlayer.getInstances(plugin)) {
             //check if player matches this one
             if (key.getUsername().equalsIgnoreCase(player.getUsername())) {
                 //set index
@@ -341,43 +345,30 @@ public class SPPlayer extends IngotPlayer {
     }
     /**
      *
-     * This method sets the plugin for the selected player. 
+     * This method sets the isfrozen in the selected spplayer.
      *
-     * @param pluginn the plugin to set
+     * @param frozenn the isFrozen to set
      */
-    @Override
-    public void setPlugin(Plugin pluginn) {
+    public void setIsFrozen(boolean frozenn) {
         //set instance list
         if (players.contains(this)) {
-            players.get(this.index).plugin = pluginn;
+            players.get(this.index).isFrozen = frozenn;
         }
         //set selection
-        this.plugin = pluginn;
-        //check fir valid player
-        if (IngotPlayer.selectPlayer(this.name, pluginn) != null) {
-            //set unextended plugin
-            IngotPlayer.selectPlayer(this.name, this.plugin).setPlugin(pluginn);
-        }
-        else {
-            //check for debug mode
-            if (config.getBoolean("enable-debug-mode") == true) {
-                Logger.getLogger(SPPlayer.class.getName()).log(Level.SEVERE, "YOU'RE SETTING AN SWARENA FIELD BUT THERE'S NO ARENA EQUIVELENT!");
-            }
-        }
+        this.isFrozen = frozenn;
     }
     /**
      *
-     * This method gets the plugin for the selected player. 
+     * This method gets the isFrozen in the selected spplayer.
      *
-     * @return the plugin object
+     * @return the isFrozen
      */
-    @Override
-    public Plugin getPlugin() {
-        //return instance list
+    public boolean getIsFrozen() {
+        //return instance array
         if (players.contains(this)) {
-            return players.get(this.index).plugin;
+            return players.get(this.index).isFrozen;
         }
         //return selection as a fallback
-        return this.plugin;
+        return this.isFrozen;
     }
 }
