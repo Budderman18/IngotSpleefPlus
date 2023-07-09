@@ -68,30 +68,27 @@ public class Main extends JavaPlugin implements Listener {
         Leaderboard board = null;
         ArrayList<String> boardsToCheck = new ArrayList<>();
         ArrayList<ArmorStand> hologramm = null;
-        ArrayList<IngotPlayer> players = new ArrayList<>();
-        ArrayList<SPPlayer> spplayers = new ArrayList<>();
+        ArrayList<IngotPlayer> iplayers = new ArrayList<>();
         byte maxSize = (byte) config.getInt("Leaderboard.max-size");
+        boolean gamesPlayed = false;
         boolean wins = false;
         boolean losses = false;
         boolean wl = false;
         boolean score = false;
         //delete all currently loaded players
-        for (SPPlayer key : SPPlayer.getSPInstances()) {
-            key.deletePlayer(false);
+        for (int i=SPPlayer.getSPInstances().size()-1; i >=0; i--) {
+            try {
+                SPPlayer.getSPInstances().get(i).deletePlayer(false);
+            }
+            catch (IndexOutOfBoundsException ex) {}
         }
         //cycle through file
         for (String key : playerdata.getKeys(false)) {
             //check if not on version
             if (!(key.equalsIgnoreCase("version"))) {
                 //add player
-                SPPlayer.createPlayer(key, false, false, false, playerdata.getInt(key + ".kills"), (short) (playerdata.getInt(key + ".deaths")), (short) (playerdata.getInt(key + ".wins")), (short) (playerdata.getInt(key + ".losses")), (short) (playerdata.getInt(key + ".score")), "", (short) 0, true, false);
+                SPPlayer.createPlayer(key, false, false, false, (playerdata.getInt(key + ".wins")), (playerdata.getInt(key + ".losses")), (playerdata.getInt(key + ".score")), (playerdata.getInt(key + ".gamesPlayed")), "", (short) 0, true, false);
             }
-        }
-        //store players
-        spplayers = SPPlayer.getSPInstances();
-        //cycle through spplayers
-        for (SPPlayer key : spplayers) {
-            players.add(key.getIngotPlayerEquivelent());
         }
         //cycle through leaderboards
         for (String key : hologram.getKeys(false)) {
@@ -112,12 +109,20 @@ public class Main extends JavaPlugin implements Listener {
                 board.deleteBoard();
             }
             else {
+                for (IngotPlayer keys : SPPlayer.getInstances(plugin)) {
+                    if (keys.getGamesPlayed() >= config.getInt("Leaderboard.min-games")) {
+                        iplayers.add(keys);
+                    }
+                }
                 //create new board
-                Leaderboard.createBoard(key, LeaderboardType.getFromString(hologram.getString(key + ".type")), players, hologramm, new Location(Bukkit.getWorld(hologram.getString(key + ".location.world")), hologram.getDouble(key + ".location.x"), hologram.getDouble(key + ".location.y"), hologram.getDouble(key + ".location.z")), (byte) hologram.getInt(key + ".max-size"), Boolean.parseBoolean(hologram.getString(key + ".invert-list")), Boolean.parseBoolean(hologram.getString(key + ".summoned")), plugin);
+                Leaderboard.createBoard(key, LeaderboardType.getFromString(hologram.getString(key + ".type")), iplayers, hologramm, new Location(Bukkit.getWorld(hologram.getString(key + ".location.world")), hologram.getDouble(key + ".location.x"), hologram.getDouble(key + ".location.y"), hologram.getDouble(key + ".location.z")), (byte) hologram.getInt(key + ".max-size"), Boolean.parseBoolean(hologram.getString(key + ".invert-list")), Boolean.parseBoolean(hologram.getString(key + ".summoned")), plugin);
             }
         }
         //cycle through current leaderboards
-        for (Leaderboard key : Leaderboard.getInstances(plugin)) {
+        for (Leaderboard key : Leaderboard.getInstances(plugin)) {//check for gamesPlayed
+            if (key.getName().equalsIgnoreCase("gamesPlayed")) {
+                gamesPlayed = true;
+            }
             //check for win
             if (key.getName().equalsIgnoreCase("wins")) {
                 wins = true;
@@ -151,28 +156,40 @@ public class Main extends JavaPlugin implements Listener {
             }
             catch (IndexOutOfBoundsException ex) {}
         }
+        iplayers = new ArrayList<>();
+        for (IngotPlayer keys : SPPlayer.getInstances(plugin)) {
+            if (keys.getGamesPlayed() >= config.getInt("Leaderboard.min-games")) {
+                iplayers.add(keys);
+            }
+        }
+        //check for wins
+        if (gamesPlayed == false) {
+            //set board to wins
+            board = Leaderboard.createBoard("gamesPlayed", LeaderboardType.GAMESPLAYED, iplayers, null, null, maxSize, false, false, plugin);
+            board.organizeLeaderboard(true);
+        }
         //check for wins
         if (wins == false) {
             //set board to wins
-            board = Leaderboard.createBoard("wins", LeaderboardType.WINS, players, null, null, maxSize, false, false, plugin);
+            board = Leaderboard.createBoard("wins", LeaderboardType.WINS, iplayers, null, null, maxSize, false, false, plugin);
             board.organizeLeaderboard(true);
         }
         //check for losses
         if (losses == false) {
             //set board to losses
-            board = Leaderboard.createBoard("losses", LeaderboardType.LOSSES, players, null, null, maxSize, false, false, plugin);
+            board = Leaderboard.createBoard("losses", LeaderboardType.LOSSES, iplayers, null, null, maxSize, false, false, plugin);
             board.organizeLeaderboard(true);
         }
         //check for wl
         if (wl == false) {
             //set board to wl
-            board = Leaderboard.createBoard("wlratio", LeaderboardType.WLRATIO, players, null, null, maxSize, false, false, plugin);
+            board = Leaderboard.createBoard("wlratio", LeaderboardType.WLRATIO, iplayers, null, null, maxSize, false, false, plugin);
             board.organizeLeaderboard(true);
         }
         //check for score
         if (score == false) {
             //set to board
-            board = Leaderboard.createBoard("score", LeaderboardType.SCORE, players, null, null, maxSize, false, false, plugin);
+            board = Leaderboard.createBoard("score", LeaderboardType.SCORE, iplayers, null, null, maxSize, false, false, plugin);
             board.organizeLeaderboard(true);
         }
     }
@@ -209,8 +226,8 @@ public class Main extends JavaPlugin implements Listener {
         SPArena temparena = null;
         Lobby lobbyy = null;
         Game gamee = null;
-        int[] pos1 = new int[3];
-        int[] pos2 = new int[3];
+        int[] pos1 = null;
+        int[] pos2 = null;
         String world = null;
         String name = null;
         byte minPlayers = 0;
@@ -233,12 +250,12 @@ public class Main extends JavaPlugin implements Listener {
         double yaw = 0;
         double pitch = 0;
         //positions
-        double[] lobby = new double[6];
+        double[] lobby = null;
         String lobbyWorld = null;
-        double[] exit = new double[6];
+        double[] exit = null;
         String exitWorld = null;
-        double[] spec = new double[6];
-        double[] center = new double[6];
+        double[] spec = null;
+        double[] center = null;
         //language
         FileConfiguration language = FileManager.getCustomData(plugin, "language", "");
         String prefixMessage = ChatColor.translateAlternateColorCodes('&', language.getString("Prefix-Message") + ""); 
@@ -344,7 +361,7 @@ public class Main extends JavaPlugin implements Listener {
                 }
                 teams.clear();
                 for (byte i=0; i < loopSize; i++) {
-                    teams.add(Team.createTeam(temparena.getArenaEquivelent().getName() + "_Team" + (i+1), null, 0, null, null, null, teamSize, false,false, false, plugin));
+                    teams.add(Team.createTeam(temparena.getArenaEquivelent().getName() + "_Team" + (i+1), null, 0, null, null, null, teamSize, false,false, false, null, plugin));
                 }
                 temparena.getArenaEquivelent().setTeams(teams);
                 //load lobby + game
@@ -371,10 +388,9 @@ public class Main extends JavaPlugin implements Listener {
         //create plugin instance
         plugin = this;
         //files
-        FileConfiguration chest = FileManager.getCustomData(plugin, "chest", ROOT);
         FileConfiguration config = FileManager.getCustomData(plugin, "config", ROOT);
-        FileConfiguration hologram = FileManager.getCustomData(plugin, "hologram", ROOT);
-        FileConfiguration playerdata = FileManager.getCustomData(plugin, "playerdata", ROOT);
+        FileManager.getCustomData(plugin, "hologram", ROOT);
+        FileManager.getCustomData(plugin, "playerdata", ROOT);
         ArrayList<String> comments = new ArrayList<>();
         //language variables
         FileConfiguration language = FileManager.getCustomData(plugin,"language",ROOT);
@@ -387,7 +403,7 @@ public class Main extends JavaPlugin implements Listener {
         String unsecureServerCMessage = ChatColor.translateAlternateColorCodes('&', language.getString("Unsecure-ServerC-Message") + ""); 
         String pluginEnabledMessage = ChatColor.translateAlternateColorCodes('&', language.getString("Plugin-Enabled-Message") + ""); 
         //check for correct version
-        if (!(Bukkit.getVersion().contains("1.20"))) {
+        if (!(Bukkit.getVersion().contains("1.20.1"))) {
             sender.sendMessage(prefixMessage + unsupportedVersionAMessage);
             sender.sendMessage(prefixMessage + unsupportedVersionBMessage);
             sender.sendMessage(prefixMessage + unsupportedVersionCMessage); 
@@ -402,7 +418,7 @@ public class Main extends JavaPlugin implements Listener {
         }
         //check for 1.0->1.1
         if (config.getString("version").contains("1.0")) {
-            sender.sendMessage(prefixMessage + "&4YOUR FILES ARE OUTDATED!!! &eUpdating...");
+            sender.sendMessage(prefixMessage + ChatColor.translateAlternateColorCodes('&', "&4YOUR FILES ARE OUTDATED!!! &eUpdating..."));
             //config
             config.set("version", "1.1");
             config.set("enable-inventories", true);
@@ -444,6 +460,21 @@ public class Main extends JavaPlugin implements Listener {
             }
             catch (IOException ex) {}
         }
+        //check for 1.1->1.2
+        if (config.getString("version").contains("1.1")) {
+            sender.sendMessage(prefixMessage + ChatColor.translateAlternateColorCodes('&', "&4YOUR FILES ARE OUTDATED!!! Updating.."));
+            language.set("SWSpec-Joined-Game-Message", "&bYou have joined the game ");
+            language.set("SWSpec-Not-Running-Message", "&bThat game isn't running");
+            language.set("SWStats-GamesPlayed-Message", "- &aGamesPlayed: &c");
+            language.set("version", "1.2");
+            config.set("version", "1.2");
+            config.set("Leaderboard.min-games", 5);
+            try {
+                language.save(new File(plugin.getDataFolder() + "/language.yml"));
+                config.save(new File(plugin.getDataFolder() + "/config.yml"));
+            }
+            catch (IOException ex) {}
+        }
         //commands
         this.getCommand("sp").setExecutor(new SPCommand());
         this.getCommand("spadmin").setExecutor(new SPAdminCommand());
@@ -478,7 +509,6 @@ public class Main extends JavaPlugin implements Listener {
         FileConfiguration language = FileManager.getCustomData(plugin, "language", ROOT);
         FileConfiguration pd = FileManager.getCustomData(plugin, "playerdata", ROOT);
         FileConfiguration hologram = FileManager.getCustomData(plugin, "hologram", ROOT);
-        FileConfiguration chest = FileManager.getCustomData(plugin, "chest", ROOT);
         //language
         String prefixMessage = ChatColor.translateAlternateColorCodes('&', language.getString("Prefix-Message")); 
         String pluginDisabledMessage = ChatColor.translateAlternateColorCodes('&', language.getString("Plugin-Disabled-Message")); 
