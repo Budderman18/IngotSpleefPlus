@@ -1,5 +1,5 @@
 #don't touch this
-version: "1.1"
+version: "1.2"
 #Configure every message here!
 #Note: changing the command names here doesnt actually change them
 # Example: Changing "/spadmin info" to "adminsp info" doesn't change the command. You still need to use "/spadmin info"
@@ -119,7 +119,7 @@ SPAdminHelp-Version-Message: "&9/spadmin version &f- &eShow the plugin version"
 SPAdmin-Version-Message: "&bYou are running version &a"
 SPAdminHelp-End-Message: "&f============================================================="
 Unsupported-VersionA-Message: "&4IngotSpleefPlus does not support your version!"
-Unsupported-VersionB-Message: "&aOnly 1.20 is supported"
+Unsupported-VersionB-Message: "&aOnly 1.20.1 is supported"
 Unsupported-VersionC-Message: "&aThis plugin will likely not work and you will get no help for issues"
 Unsecure-ServerA-Message: "&4NEVER EVER EVER EVER EVER EVER USE OFFLINE MODE!!!!!!!!!!!!!!!"
 Unsecure-ServerB-Message: "&cOffline mode is a serious threat to your server and will never be supported by my plugins!"

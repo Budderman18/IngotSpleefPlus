@@ -3,7 +3,7 @@ authors:
 - Budderman18
 description: "A spleef plugin focused on simplicity and efficency."
 main: com.budderman18.IngotSpleefPlus.Main
-version: 1.1
+version: 1.2
 api-version: 1.13
 depend: [IngotMinigamesAPI]
 softdepend: [Multiverse-Core]
@@ -32,6 +32,9 @@ permissions:
         default: true
     ingotsp.sp.randomjoin:
         description: Gives access to the /sp randomjoin command
+        default: true
+    ingotsp.sp.spec:
+        description: Gives access to the /sp spec command
         default: true
     ingotsp.sp.leave:
         description: Gives access to the /sp leave command
@@ -129,6 +132,7 @@ permissions:
         children:
         - ingotsp.sp
         - ingotsp.sp.join
+        - ingotsp.sp.spec
         - ingotsp.sp.kit
         - ingotsp.sp.team
         - ingotsp.sp.randomJoin
