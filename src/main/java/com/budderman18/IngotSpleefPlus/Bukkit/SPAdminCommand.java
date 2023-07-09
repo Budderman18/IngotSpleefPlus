@@ -471,7 +471,7 @@ public class SPAdminCommand implements TabExecutor {
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         //local vars
         boolean exists = false;
-        String version = null;
+        boolean invertList = false;
         String world = null;
         String loby = null;
         String exit = null;
@@ -481,6 +481,7 @@ public class SPAdminCommand implements TabExecutor {
         Player player = null;
         SPArena tempArena = null;
         byte index = 0;
+        Location locc = null;
         Leaderboard tempboard = null;
         List<IngotPlayer> spplayers = new ArrayList<>();
         File hologramf = new File(plugin.getDataFolder(), "hologram.yml");
@@ -791,15 +792,15 @@ public class SPAdminCommand implements TabExecutor {
                                             //cycle through all iplayers
                                             for (SPPlayer key : SPPlayer.getSPInstances()) {
                                                 //check if in lobby
-                                                if (key.getInGame() == true && key.getIsPlaying() == false && key.getGame().equalsIgnoreCase(tempArena.getName())) {
+                                                if (key.getIngotPlayerEquivelent().getInGame() == true && key.getIngotPlayerEquivelent().getIsPlaying() == false && key.getIngotPlayerEquivelent().getGame().equalsIgnoreCase(tempArena.getName())) {
                                                     Lobby.selectLobby(tempArena).leaveLobby(key, true, config.getBoolean("enable-inventories"));
                                                 }
                                                 //check if in game
-                                                if (key.getInGame() == true && key.getIsPlaying() == false && key.getGame().equalsIgnoreCase(tempArena.getName())) {
-                                                    Game.selectGame(tempArena).leaveGame(SPPlayer.selectPlayer(key.getUsername()), true, false, config.getBoolean("enable-inventories"));
+                                                if (key.getIngotPlayerEquivelent().getInGame() == true && key.getIngotPlayerEquivelent().getIsPlaying() == false && key.getIngotPlayerEquivelent().getGame().equalsIgnoreCase(tempArena.getName())) {
+                                                    Game.selectGame(tempArena).leaveGame(SPPlayer.selectPlayer(key.getUsername()), true, false, config.getBoolean("enable-inventories"), false);
                                                 }
                                                 //check if arena is empty
-                                                if (tempArena.getCurrentPlayers() == 0) {
+                                                if (tempArena.getArenaEquivelent().getCurrentPlayers() == 0) {
                                                     break;
                                                 }
                                             }
@@ -1053,6 +1054,9 @@ public class SPAdminCommand implements TabExecutor {
                     }
                     //check if player has permission(s)
                     if (sender.hasPermission("ingotsp.spadmin.hologram")) {
+                        if (args.length >= 4) {
+                            invertList = Boolean.parseBoolean(args[3]);
+                        }
                         if (args.length >= 3 && !args[1].equalsIgnoreCase("calculateScore")) {
                             //get board
                             tempboard = Leaderboard.selectBoard(args[2], plugin);
@@ -1062,8 +1066,18 @@ public class SPAdminCommand implements TabExecutor {
                                 if (tempboard != null) {
                                     //check if not summoned
                                     if (tempboard.getSummoned() == false && (tempboard.getType() != LeaderboardType.KILLS || tempboard.getType() != LeaderboardType.DEATHS)) {
-                                        //summon hologram
-                                        tempboard.setHoloLoc(player.getLocation());
+                                        //check for centerize
+                                        if (config.getBoolean("centerize-teleport-locations") == true) {
+                                            locc = player.getLocation();
+                                            locc.setX(locc.getBlockX()+0.5);
+                                            locc.setY(locc.getBlockY());
+                                            locc.setZ(locc.getBlockZ()+0.5);
+                                            tempboard.setHoloLoc(locc);
+                                        }
+                                        else {
+                                            tempboard.setHoloLoc(player.getLocation());
+                                        }
+                                        tempboard.setInvertList(invertList);
                                         tempboard.organizeLeaderboard(true);
                                         tempboard.summonHologram(config.getString("Leaderboard.header"), config.getString("Leaderboard.format"), config.getString("Leaderboard.footer"), true);
                                         tempboard.saveToFile(false);
@@ -1122,15 +1136,15 @@ public class SPAdminCommand implements TabExecutor {
                                 if (tempboard != null) {
                                     //check if summoned
                                     if (tempboard.getSummoned() == true) {
-                                        //recalculate the players
                                         spplayers.clear();
-                                        for (IngotPlayer key : IngotPlayer.getInstances(plugin)) {
-                                            if (key.getPlugin() == plugin) {
+                                        for (SPPlayer key : SPPlayer.getSPInstances()) {
+                                            if (key.getIngotPlayerEquivelent().getGamesPlayed() >= config.getInt("Leaderboard.min-games") && key.getPlugin() == plugin) {
                                                 spplayers.add(key);
                                             }
                                         }
                                         //refresh hologram
                                         tempboard.setPlayers((ArrayList<IngotPlayer>) spplayers);
+                                        tempboard.setInvertList(invertList);
                                         tempboard.organizeLeaderboard(true);
                                         tempboard.summonHologram(config.getString("Leaderboard.header"), config.getString("Leaderboard.format"), config.getString("Leaderboard.footer"), true);
                                         //tell player and return
@@ -1227,8 +1241,7 @@ public class SPAdminCommand implements TabExecutor {
                         //version feature
                         if (args[0].equalsIgnoreCase("version")) {
                             //get version
-                            version = language.getString("version");
-                            sender.sendMessage(prefixMessage + versionMessage + version);
+                            sender.sendMessage(prefixMessage + versionMessage + plugin.getDescription().getVersion());
                             //end command
                             return true;
                         }
@@ -1287,7 +1300,7 @@ public class SPAdminCommand implements TabExecutor {
                                 if (!Game.selectGame(key).getPlayers().isEmpty()) {
                                     //force players to leave game
                                     for (byte i=(byte) (Game.selectGame(key).getPlayers().size()-1); i >= 0; i--) {
-                                        Game.selectGame(key).leaveGame(SPPlayer.selectPlayer(Game.selectGame(key).getPlayers().get(i).getUsername()), true, false, config.getBoolean("enable-inventories"));
+                                        Game.selectGame(key).leaveGame(SPPlayer.selectPlayer(Game.selectGame(key).getPlayers().get(i).getUsername()), true, false, config.getBoolean("enable-inventories"), false);
                                     }
                                 }
                                 //delete arena

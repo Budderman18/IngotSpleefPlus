@@ -658,12 +658,14 @@ public class Events implements Listener {
                 }
             }
             //create object
-            iplayer = SPPlayer.createPlayer(event.getPlayer().getName(), false, false, false, 0, (short) (0), (short) (0), (short) (0), (short) (0), "", (short) 0, true, false);
+            iplayer = SPPlayer.createPlayer(event.getPlayer().getName(), false, false, false, 0, 0, 0, 0, "", (short) (0), true, false);
             //cycle through leaderboards
             for (Leaderboard key : Leaderboard.getInstances(plugin)) {
-                //add the new player
-                key.addPlayer(iplayer);
-                key.organizeLeaderboard(true);
+                if (key.getPlugin() == plugin && config.getInt("Leaderboard.min-games") == 0) {
+                    //add the new player
+                    key.addPlayer(iplayer);
+                    key.organizeLeaderboard(true);
+                }
             }
         }
         else {
@@ -693,7 +695,7 @@ public class Events implements Listener {
             else if (iplayer.getIngotPlayerEquivelent().getIsPlaying() == true) {
                 //leave game
                 game = Game.selectGame(SPArena.selectArena(iplayer.getIngotPlayerEquivelent().getGame()));
-                game.leaveGame(SPPlayer.selectPlayer(event.getPlayer().getName()), true, true, config.getBoolean("enable-inventories"));
+                game.leaveGame(SPPlayer.selectPlayer(event.getPlayer().getName()), true, true, config.getBoolean("enable-inventories"), true);
             }
             //check if spectating
             else if (iplayer.getIngotPlayerEquivelent().getIsPlaying() == true && event.getPlayer().getGameMode() == GameMode.SPECTATOR) {

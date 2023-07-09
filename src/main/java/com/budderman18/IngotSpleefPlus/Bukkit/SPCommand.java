@@ -46,12 +46,15 @@ public class SPCommand implements TabExecutor {
     private static String joinArenaFullMessage = ChatColor.translateAlternateColorCodes('&', language.getString("SPJoin-Arena-Full-Message") + "");
     private static String joinArenaRunningMessage = ChatColor.translateAlternateColorCodes('&', language.getString("SPJoin-Arena-Running-Message") + "");
     private static String joinArenaDisabledMessage = ChatColor.translateAlternateColorCodes('&', language.getString("SPJoin-Arena-Disabled-Message") + "");
+    private static String specJoinedGameMessage = ChatColor.translateAlternateColorCodes('&', language.getString("SPSpec-Joined-Game-Message") + "");
+    private static String specNotRunningMessage = ChatColor.translateAlternateColorCodes('&', language.getString("SPSpec-Not-Running-Message") + "");
     private static String teamJoinedMessage = ChatColor.translateAlternateColorCodes('&', language.getString("SPTeam-Joined-Message") + "");
     private static String teamFullMessage = ChatColor.translateAlternateColorCodes('&', language.getString("SPTeam-Full-Message") + "");
     private static String leaveLeftGameMessage = ChatColor.translateAlternateColorCodes('&', language.getString("SPLeave-Left-Game-Message") + "");
     private static String leaveNotPlayingMessage = ChatColor.translateAlternateColorCodes('&', language.getString("SPLeave-Not-Playing-Message") + "");
     private static String statStartMessage1 = ChatColor.translateAlternateColorCodes('&', language.getString("SPStats-Start-Message-1") + "");
     private static String statStartMessage2 = ChatColor.translateAlternateColorCodes('&', language.getString("SPStats-Start-Message-2") + "");
+    private static String statGamesPlayedMessage = ChatColor.translateAlternateColorCodes('&', language.getString("SPStats-GamesPlayed-Message") + "");   
     private static String statWinsMessage = ChatColor.translateAlternateColorCodes('&', language.getString("SPStats-Wins-Message") + "");
     private static String statLossesMessage = ChatColor.translateAlternateColorCodes('&', language.getString("SPStats-Losses-Message") + "");
     private static String statWLRatioMessage = ChatColor.translateAlternateColorCodes('&', language.getString("SPStats-WLRatio-Message") + "");
@@ -90,12 +93,15 @@ public class SPCommand implements TabExecutor {
         joinArenaFullMessage = ChatColor.translateAlternateColorCodes('&', language.getString("SPJoin-Arena-Full-Message") + "");
         joinArenaRunningMessage = ChatColor.translateAlternateColorCodes('&', language.getString("SPJoin-Arena-Running-Message") + "");
         joinArenaDisabledMessage = ChatColor.translateAlternateColorCodes('&', language.getString("SPJoin-Arena-Disabled-Message") + "");
+        specJoinedGameMessage = ChatColor.translateAlternateColorCodes('&', language.getString("SPSpec-Joined-Game-Message") + "");
+        specNotRunningMessage = ChatColor.translateAlternateColorCodes('&', language.getString("SPSpec-Not-Running-Message") + "");
         leaveLeftGameMessage = ChatColor.translateAlternateColorCodes('&', language.getString("SPLeave-Left-Game-Message") + "");
         teamJoinedMessage = ChatColor.translateAlternateColorCodes('&', language.getString("SPTeam-Joined-Message") + "");
         teamFullMessage = ChatColor.translateAlternateColorCodes('&', language.getString("SPTeam-Full-Message") + "");
         leaveNotPlayingMessage = ChatColor.translateAlternateColorCodes('&', language.getString("SPLeave-Not-Playing-Message") + "");
         statStartMessage1 = ChatColor.translateAlternateColorCodes('&', language.getString("SPStats-Start-Message-1") + "");
         statStartMessage2 = ChatColor.translateAlternateColorCodes('&', language.getString("SPStats-Start-Message-2") + "");
+        statGamesPlayedMessage = ChatColor.translateAlternateColorCodes('&', language.getString("SPStats-GamesPlayed-Message") + "");
         statWinsMessage = ChatColor.translateAlternateColorCodes('&', language.getString("SPStats-Wins-Message") + "");
         statLossesMessage = ChatColor.translateAlternateColorCodes('&', language.getString("SPStats-Losses-Message") + "");
         statWLRatioMessage = ChatColor.translateAlternateColorCodes('&', language.getString("SPStats-WLRatio-Message") + "");
@@ -208,7 +214,7 @@ public class SPCommand implements TabExecutor {
                 if (sender.hasPermission("ingotsp.sp")) {
                     //check if player has permission(s)
                     if (sender.hasPermission("ingotsp.sp.join") && (sender instanceof Player)) {
-                        inGame = iplayer.getInGame();
+                        inGame = iplayer.getIngotPlayerEquivelent().getInGame();
                         //join feature
                         if (args[0].equalsIgnoreCase("join")) {
                             //check if player isnt ingame
@@ -348,12 +354,12 @@ public class SPCommand implements TabExecutor {
                     if (sender.hasPermission("ingotsp.sp.team") && (sender instanceof Player)) {
                         //join feature
                         if (args[0].equalsIgnoreCase("team")) {
-                            inGame = iplayer.getInGame();
+                            inGame = iplayer.getIngotPlayerEquivelent().getInGame();
                             team = Team.selectTeam(args[1], plugin);
                             //check if player isnt ingame
-                            if (args.length > 1 && inGame == true && iplayer.getIsPlaying() == false) {
+                            if (args.length > 1 && inGame == true && iplayer.getIngotPlayerEquivelent().getIsPlaying() == false) {
                                 if (team != null && team.getMembers().size() < team.getMaxSize()) {
-                                    iplayer.setTeam(team, true);
+                                    iplayer.getIngotPlayerEquivelent().setTeam(team, true, false);
                                     sender.sendMessage(prefixMessage + teamJoinedMessage + team.getName());
                                     return true;
                                 }
@@ -371,23 +377,59 @@ public class SPCommand implements TabExecutor {
                         }
                     }
                     //check if player has permission(s)
+                    if (sender.hasPermission("ingotsw.sw.spec") && (sender instanceof Player)) {
+                        inGame = iplayer.getIngotPlayerEquivelent().getInGame();
+                        //join feature
+                        if (args[0].equalsIgnoreCase("spec")) {
+                            //check if player isnt ingame
+                            if (args.length > 1) {
+                                //check if player is ingame
+                                if (inGame == false) {
+                                    //try to join game
+                                    if (SPArena.selectArena(args[1]).getArenaEquivelent().getStatus() == ArenaStatus.RUNNING) {
+                                        Game.selectGame(SPArena.selectArena(args[1])).joinAsSpectator(iplayer);
+                                        sender.sendMessage(prefixMessage + specJoinedGameMessage);
+                                        return true;
+                                    }
+                                    else {
+                                        sender.sendMessage(prefixMessage + specNotRunningMessage);
+                                        return true;
+                                    }
+                                }
+                                //run if player is in game
+                                else {
+                                    //run if player is already playing
+                                    sender.sendMessage(prefixMessage + joinAlreadyPlayingMessage);
+                                    //end command
+                                    return true;
+                                }
+                            }
+                            //run if arena doesn't exist
+                            else {
+                                sender.sendMessage(prefixMessage + joinArenaMissingMessage);
+                                //end command
+                                return true;
+                            }
+                        }
+                    }
+                    //check if player has permission(s)
                     if (sender.hasPermission("ingotsp.sp.leave") && (sender instanceof Player)) {
                         //get ingame
-                        inGame = iplayer.getInGame();
+                        inGame = iplayer.getIngotPlayerEquivelent().getInGame();
                         //leave feature
                         if (args[0].equalsIgnoreCase("leave")) {
                             //check if player isn't ingame
                             if (inGame == true) {
                                 //load arena
-                                loadedArena = SPArena.selectArena(iplayer.getGame());
+                                loadedArena = SPArena.selectArena(iplayer.getIngotPlayerEquivelent().getGame());
                                 //leave lobby
-                                if (iplayer.getIsPlaying() == false) {
+                                if (iplayer.getIngotPlayerEquivelent().getIsPlaying() == false) {
                                     lobby = Lobby.selectLobby(loadedArena);
                                     lobby.leaveLobby(SPPlayer.selectPlayer(player.getName()), true, config.getBoolean("enable-inventories"));
                                 } //leave game
-                                else if (iplayer.getIsPlaying() == true) {
+                                else if (iplayer.getIngotPlayerEquivelent().getIsPlaying() == true) {
                                     game = Game.selectGame(loadedArena);
-                                    game.leaveGame(SPPlayer.selectPlayer(iplayer.getUsername()), true, true, config.getBoolean("enable-inventories"));
+                                    game.leaveGame(SPPlayer.selectPlayer(iplayer.getUsername()), true, true, config.getBoolean("enable-inventories"), true);
                                 }
                                 //notify player
                                 sender.sendMessage(prefixMessage + leaveLeftGameMessage);
@@ -421,16 +463,18 @@ public class SPCommand implements TabExecutor {
                             }
                             //display stats
                             sender.sendMessage(statStartMessage1 + iplayer.getUsername() + statStartMessage2);
+                            sender.sendMessage(statGamesPlayedMessage + iplayer.getIngotPlayerEquivelent().getGamesPlayed());
                             sender.sendMessage(statWinsMessage + iplayer.getIngotPlayerEquivelent().getWins());
                             sender.sendMessage(statLossesMessage + iplayer.getIngotPlayerEquivelent().getLosses());
                             if (iplayer.getIngotPlayerEquivelent().getLosses() != 0) {
-                                sender.sendMessage(statWLRatioMessage + (iplayer.getIngotPlayerEquivelent().getWins() / iplayer.getIngotPlayerEquivelent().getLosses()));
+                                sender.sendMessage(statWLRatioMessage + ((double) iplayer.getIngotPlayerEquivelent().getWins() / (double) iplayer.getIngotPlayerEquivelent().getLosses()));
                             }
                             else {
                                 sender.sendMessage(statWLRatioMessage + iplayer.getIngotPlayerEquivelent().getWins());
                             }
                             sender.sendMessage(statScoreMessage + iplayer.getIngotPlayerEquivelent().getScore());
                             sender.sendMessage(statEndMessage);
+                            return true;
                         }
                     }
                     //check if player has permission(s)
