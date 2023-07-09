@@ -2,6 +2,7 @@ package com.budderman18.IngotSpleefPlus.Core;
 
 import com.budderman18.IngotMinigamesAPI.Core.Data.ArenaStatus;
 import com.budderman18.IngotMinigamesAPI.Core.Data.FileManager;
+import com.budderman18.IngotMinigamesAPI.Core.Data.Leaderboard;
 import com.budderman18.IngotMinigamesAPI.Core.Data.Spawn;
 import com.budderman18.IngotMinigamesAPI.Core.Data.Team;
 import com.budderman18.IngotMinigamesAPI.Core.Handlers.BossbarHandler;
@@ -229,7 +230,7 @@ public class Lobby {
             //check if team has room
             if (key.getMembers().size() < key.getMaxSize()) {
                 //set team
-                iplayer.getIngotPlayerEquivelent().setTeam(key, true);
+                key.addPlayer(iplayer.getIngotPlayerEquivelent());
                 break;
             }
         }
@@ -281,7 +282,7 @@ public class Lobby {
         }
         //leave team
         if (iplayer.getIngotPlayerEquivelent().getTeam() != null && leaveTeam == true) {
-            iplayer.getIngotPlayerEquivelent().getTeam().removePlayer(iplayer);
+            iplayer.getIngotPlayerEquivelent().getTeam().removePlayer(iplayer.getIngotPlayerEquivelent());
         }
         //restore inventory
         if (useInventory == true) {

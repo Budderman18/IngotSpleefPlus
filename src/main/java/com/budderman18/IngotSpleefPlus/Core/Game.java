@@ -2,6 +2,7 @@ package com.budderman18.IngotSpleefPlus.Core;
 
 import com.budderman18.IngotMinigamesAPI.Core.Data.ArenaStatus;
 import com.budderman18.IngotMinigamesAPI.Core.Data.FileManager;
+import com.budderman18.IngotMinigamesAPI.Core.Data.IngotPlayer;
 import com.budderman18.IngotMinigamesAPI.Core.Data.Leaderboard;
 import com.budderman18.IngotMinigamesAPI.Core.Data.Spawn;
 import com.budderman18.IngotMinigamesAPI.Core.Data.Team;
@@ -55,6 +56,7 @@ public class Game {
     private BossBar bossbar = null;
     private int index = 0;
     private ArrayList<SPPlayer> players = new ArrayList<>();
+    private ArrayList<SPPlayer> spectatingplayers = new ArrayList<>();
     private static int trueIndex = 0;
     private static ArrayList<Game> games = new ArrayList<>();
     //language
@@ -205,13 +207,15 @@ public class Game {
      * @param displayTitle true to display titles
      * @param addLoss weather or not to add a loss to the player
      * @param useInventory true to manage inventories
+     * @param gamePlayed true to game played
      */
-    public void leaveGame(SPPlayer iplayer, boolean displayTitle, boolean addLoss, boolean useInventory) {
+    public void leaveGame(SPPlayer iplayer, boolean displayTitle, boolean addLoss, boolean useInventory, boolean gamePlayed) {
         //local vars
         Location exitLoc = new Location(Bukkit.getWorld(this.arena.getArenaEquivelent().getExitWorld()), this.arena.getArenaEquivelent().getExit()[0], this.arena.getArenaEquivelent().getExit()[1], this.arena.getArenaEquivelent().getExit()[2], (float) this.arena.getArenaEquivelent().getExit()[3], (float) this.arena.getArenaEquivelent().getExit()[4]); 
         Player player = Bukkit.getPlayer(iplayer.getUsername());
-        short losses = iplayer.getIngotPlayerEquivelent().getLosses();
-        short score = iplayer.getIngotPlayerEquivelent().getScore();
+        int losses = iplayer.getIngotPlayerEquivelent().getLosses();
+        int score = iplayer.getIngotPlayerEquivelent().getScore();
+        int gamesPlayed = iplayer.getIngotPlayerEquivelent().getGamesPlayed();
         //remove player
         this.players.remove(iplayer);
         this.currentPlayers--;
@@ -269,6 +273,58 @@ public class Game {
         if (useInventory == true) {
             iplayer.getIngotPlayerEquivelent().applyInventory(true, true, true);
         }
+        if (gamePlayed == true) {
+            gamesPlayed++;
+            iplayer.getIngotPlayerEquivelent().setGamesPlayed(gamesPlayed);
+            score = score += config.getInt("Score.gamePlayed");
+            iplayer.getIngotPlayerEquivelent().setScore(score);
+            //check if adding to leaderboards
+            if (iplayer.getIngotPlayerEquivelent().getGamesPlayed() == config.getInt("Leaderboard.min-games")) {
+                for (Leaderboard key : Leaderboard.getInstances(plugin)) {
+                    key.addPlayer(iplayer.getIngotPlayerEquivelent());
+                }
+            }
+            iplayer.saveToFile();
+        }
+    }
+    /**
+     * 
+     * This method joins a player as a spectator
+     * 
+     * @param iplayer the player to spectate
+     */
+    public void joinAsSpectator(SPPlayer iplayer) {
+        //local vars
+        Player player = Bukkit.getPlayer(iplayer.getUsername());
+        //add player
+        this.spectatingplayers.add(iplayer);
+        //teleport
+        player.teleport(new Location(Bukkit.getWorld(this.arena.getArenaEquivelent().getWorld()), this.arena.getArenaEquivelent().getSpectatorPos()[0],  this.arena.getArenaEquivelent().getSpectatorPos()[1], this.arena.getArenaEquivelent().getSpectatorPos()[2], (float) this.arena.getArenaEquivelent().getSpectatorPos()[3], (float) this.arena.getArenaEquivelent().getSpectatorPos()[4]));
+        player.setGameMode(GameMode.SPECTATOR);
+        //de to weird gamemode bugs, we need to change gamemode again
+        TimerHandler.runTimer(plugin, 0, 1, () -> {player.setGameMode(GameMode.SPECTATOR);}, false, false);
+        //set iplayer vars
+        iplayer.getIngotPlayerEquivelent().setInGame(true);
+        iplayer.getIngotPlayerEquivelent().setIsAlive(false);
+        iplayer.getIngotPlayerEquivelent().setGame(this.arena.getArenaEquivelent().getName());
+    }
+    /**
+     * 
+     * This method joins a player as a spectator
+     * 
+     * @param iplayer the player to spectate
+     */
+    public void leaveAsSpectator(SPPlayer iplayer) {
+        //local vars
+        Player player = Bukkit.getPlayer(iplayer.getUsername());
+        //add player
+        this.spectatingplayers.remove(iplayer);
+        //teleport
+        player.teleport(new Location(Bukkit.getWorld(this.arena.getArenaEquivelent().getExitWorld()), this.arena.getArenaEquivelent().getExit()[0],  this.arena.getArenaEquivelent().getExit()[1], this.arena.getArenaEquivelent().getExit()[2], (float) this.arena.getArenaEquivelent().getExit()[3], (float) this.arena.getArenaEquivelent().getExit()[4]));
+        player.setGameMode(GameMode.ADVENTURE);
+        //set iplayer vars
+        iplayer.getIngotPlayerEquivelent().setInGame(false);
+        iplayer.getIngotPlayerEquivelent().setGame(null);
     }
     /**
      *
@@ -304,8 +360,8 @@ public class Game {
             Player player = null;
             short lastBroken = 0;
             short broken = 0;
-            short wins = 0;
-            short score = 0;
+            int wins = 0;
+            int score = 0;
             String message = null;
             SPPlayer keyy = null;
             SPPlayer winner = null;
@@ -357,15 +413,20 @@ public class Game {
                 }
                 //check if winner isnt null
                 if (winner != null) {
-                    //set message
-                    message = "&6" + winner.getUsername() + gameWinnerMessage;
-                    //update wins and score
-                    wins = winner.getIngotPlayerEquivelent().getWins();
-                    score = winner.getIngotPlayerEquivelent().getScore();
-                    wins++;
-                    score += config.getInt("Score.win");
-                    winner.getIngotPlayerEquivelent().setWins(wins);
-                    winner.getIngotPlayerEquivelent().setScore(score);
+                    message = "&6";
+                    for (IngotPlayer key : winner.getIngotPlayerEquivelent().getTeam().getMembers()) {
+                        //set message
+                        message = message.concat(key.getUsername() + " & ");
+                        //update wins and score
+                        wins = key.getWins();
+                        score = key.getScore();
+                        wins++;
+                        score += config.getInt("Score.win");
+                        key.setWins(wins);
+                        key.setScore(score);
+                    }
+                    message = message.substring(0, message.length()-3);
+                    message = message.concat(gameWinnerMessage);
                     //sent message and stop timers
                     ChatHandler.sendMessageToAll(ChatHandler.convertMessage(null, message, config.getString("Chat.format")), true, true, this.arena.getArenaEquivelent(), plugin);
                     TimerHandler.cancelTimer(this.taskNumber);
@@ -414,11 +475,11 @@ public class Game {
                 //check if player is dead
                 if (this.players.get(i).getIngotPlayerEquivelent().getIsAlive() == false) {
                     //force leave
-                    this.leaveGame(SPPlayer.selectPlayer(this.players.get(i).getIngotPlayerEquivelent().getUsername()), false, true, config.getBoolean("enable-inventories"));
+                    this.leaveGame(SPPlayer.selectPlayer(this.players.get(i).getIngotPlayerEquivelent().getUsername()), false, true, config.getBoolean("enable-inventories"), true);
                 }
                 //run to force winner to leave
                 else {
-                    this.leaveGame(SPPlayer.selectPlayer(this.players.get(i).getIngotPlayerEquivelent().getUsername()), true, false, config.getBoolean("enable-inventories"));
+                    this.leaveGame(SPPlayer.selectPlayer(this.players.get(i).getIngotPlayerEquivelent().getUsername()), true, false, config.getBoolean("enable-inventories"), true);
                 }
             }
             //set arena as inactive
@@ -526,6 +587,7 @@ public class Game {
             int startTime = this.arena.getArenaEquivelent().getGameWaitTime();
             int start = this.arena.getArenaEquivelent().getGameLengthTime();
             int end = 0;
+            byte teamsLeft = 0;
             Player player = null;
             String blankString = " ";
             String lineString = null;
@@ -611,8 +673,20 @@ public class Game {
                     key.getIngotPlayerEquivelent().setIsPlaying(false);
                 }
             }
+            //cycle through teams
+            for (Team key : this.arena.getArenaEquivelent().getTeams()) {
+                //check if not empty
+                if (!key.getMembers().isEmpty()) {
+                    for (IngotPlayer keys : key.getMembers()) {
+                        if (keys.getIsAlive() == true) {
+                            teamsLeft++;
+                            break;
+                        }
+                    }
+                }
+            }
             //check if only 1 survivor or out of time
-            if (this.alivePlayers <= 1 || (short) this.time >= this.arena.getArenaEquivelent().getGameLengthTime()) {
+            if (teamsLeft == 1 || (short) this.time >= this.arena.getArenaEquivelent().getGameLengthTime()) {
                 endTimer.run(); 
             }
             //check if bossbar is enabled

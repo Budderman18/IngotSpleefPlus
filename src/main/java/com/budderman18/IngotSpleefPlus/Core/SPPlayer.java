@@ -46,6 +46,7 @@ public class SPPlayer extends IngotPlayer {
      * @param deathss the deaths
      * @param winss the wins
      * @param killss the kills
+     * @param gamesPlayedd the gamesPLayed
      * @param scoree the score
      * @param gamee the game
      * @param jumpp the isJumping
@@ -54,14 +55,14 @@ public class SPPlayer extends IngotPlayer {
      * @param isFrozenn the isFrozen
      * @return The player object that was generated
      */
-    public static SPPlayer createPlayer(String iplayer, boolean inGamee, boolean isPlayingg, boolean isAlivee, int killss, short deathss, short winss, short lossess, short scoree, String gamee, short brokenn, boolean jumpp, boolean isFrozenn) {
+    public static SPPlayer createPlayer(String iplayer, boolean inGamee, boolean isPlayingg, boolean isAlivee, int winss, int lossess, int scoree, int gamesPlayedd, String gamee, short brokenn, boolean jumpp, boolean isFrozenn) {
         //newPlayer
         IngotPlayer extendedPlayer = null;
         SPPlayer player = null;
         //check if unextended player needs creation
         if (IngotPlayer.selectPlayer(iplayer, plugin) == null) {
             //create player
-            extendedPlayer = IngotPlayer.createPlayer(iplayer, inGamee, isPlayingg, isAlivee, killss, deathss, winss, lossess, scoree, gamee, plugin);    
+            extendedPlayer = IngotPlayer.createPlayer(iplayer, inGamee, isPlayingg, isAlivee, 0, 0, winss, lossess, scoree, gamesPlayedd, gamee, plugin);    
         }
         else {
             //select player
@@ -204,7 +205,7 @@ public class SPPlayer extends IngotPlayer {
         newPlayer.setInventory(player.getInventory());
         newPlayer.setEffects(player.getEffects());
         newPlayer.setXP(player.getXP());
-        newPlayer.setTeam(player.getTeam(), false);
+        newPlayer.setTeam(player.getTeam(), false, true);
         newPlayer.setGame(player.getGame());
         newPlayer.setHealth(player.getHealth());
         newPlayer.setKills(player.getKills());
